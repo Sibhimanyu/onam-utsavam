@@ -212,6 +212,10 @@ body {
   padding: 12px 14px;
   font: inherit;
   font-size: 14.5px;
+  /* `font: inherit` does not carry colour, so options were falling back to the
+     UA button default of pure black — the only pure black on an otherwise warm
+     palette. */
+  color: var(--ink);
   background: var(--paper);
   border: 1px solid var(--hair);
   border-radius: 10px;
@@ -260,6 +264,18 @@ body {
 }
 .fb.ok { color: var(--green); }
 .fb.no { color: var(--red); }
+
+/* ---------- focus ----------
+
+   The browser default was `outline: auto 1px rgb(0, 95, 204)` — a thin system
+   blue that clashes badly with this warm cream palette and reads as unstyled.
+   :focus-visible (not :focus) so a mouse click never paints a ring, only
+   keyboard navigation does. */
+:where(.opt, .btn, .lb-form input, button):focus-visible {
+  outline: 2px solid var(--red);
+  outline-offset: 2px;
+  border-radius: 10px;
+}
 
 /* ---------- buttons ---------- */
 
