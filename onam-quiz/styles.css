@@ -57,10 +57,17 @@ body {
   width: 100%;
   max-width: 460px;
   background: var(--paper);
-  border: 1px solid var(--hair);
+  /* Warm gold border — the stage frame is part of the festival, not just a
+     container. Inner shadow adds a gentle champfer so the kasavu stripe
+     appears set into the frame rather than floating on top. */
+  border: 1.5px solid rgba(201, 162, 39, 0.55);
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 1px 2px rgba(42, 33, 24, .04), 0 10px 30px rgba(42, 33, 24, .06);
+  box-shadow:
+    0 0 0 5px rgba(201, 162, 39, 0.09),   /* outer gold halo */
+    0 2px 4px rgba(42, 33, 24, .04),
+    0 16px 48px rgba(42, 33, 24, .10),
+    0 40px 80px rgba(168, 32, 26, .04);
   position: relative;
 }
 
