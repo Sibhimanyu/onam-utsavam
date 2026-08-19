@@ -151,6 +151,12 @@ body {
   .ring.bloomed .petal { animation: fade .3s ease both; animation-delay: 0s; }
   @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
   .bar > i { transition: none; }
+  /* The bloom, bar and pulse were covered but hover lift was not — every
+     .opt and .btn still ran a translateY under reduce. Cover the movement
+     while keeping the colour change, which is the part that carries meaning. */
+  .opt:hover:not(:disabled),
+  .btn:hover { transform: none; }
+  .opt, .btn { transition-property: border-color, background; }
 }
 
 /* ---------- panel ---------- */
@@ -161,12 +167,14 @@ body {
   font-family: var(--serif);
   font-size: 27px;
   line-height: 1.15;
+  text-wrap: balance;
   text-align: center;
   margin: 6px 0 8px;
   color: var(--red);
 }
 
 .lede {
+  text-wrap: pretty;
   text-align: center;
   font-size: 14px;
   line-height: 1.55;
@@ -198,6 +206,9 @@ body {
   font-size: 19px;
   line-height: 1.35;
   margin: 0 0 14px;
+  /* Question text wraps to 3 lines and was orphaning single words
+     ("pookalam?" alone on its own line). Falls back silently. */
+  text-wrap: balance;
 }
 
 /* ---------- options ---------- */
@@ -401,6 +412,7 @@ body {
 
 .host-title {
   font-family: var(--serif);
+  text-wrap: balance;
   font-size: 26px;
   text-align: center;
   color: var(--red);
