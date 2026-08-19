@@ -132,6 +132,145 @@ const QUESTION_POOL = [
     question: "Kaikottikali, the women's circle dance of Onam, goes by which other name?",
     options: ["Thiruvathirakali", "Kathakali", "Mohiniyattam", "Ottamthullal"],
     answer: "Thiruvathirakali"
+  },
+
+  // ---- the ten days ----
+  {
+    area: "The ten days",
+    question: "How many days does Onam traditionally run?",
+    options: ["Ten", "Three", "Five", "A fortnight"],
+    answer: "Ten"
+  },
+  {
+    area: "The ten days",
+    question: "Which day opens the festival, when the first pookalam is laid?",
+    options: ["Atham", "Thiruvonam", "Uthradam", "Avittam"],
+    answer: "Atham"
+  },
+  {
+    area: "The ten days",
+    question: "Uthradam, the day before Thiruvonam, is best known as the day for what?",
+    options: [
+      "Last-minute shopping and preparation",
+      "Fasting before the feast",
+      "Dismantling the pookalam",
+      "Racing the snake boats"
+    ],
+    answer: "Last-minute shopping and preparation"
+  },
+  {
+    area: "The ten days",
+    question: "The grand procession at Tripunithura that traditionally marks Onam's opening day is called what?",
+    options: ["Athachamayam", "Vallam Kali", "Pulikali", "Thumbi thullal"],
+    answer: "Athachamayam"
+  },
+
+  // ---- places ----
+  {
+    area: "Places",
+    question: "Which temple near Kochi is the main centre of Onam worship, held to be Mahabali's old capital?",
+    options: [
+      "Thrikkakara Temple",
+      "Guruvayur Temple",
+      "Sabarimala",
+      "Padmanabhaswamy Temple"
+    ],
+    answer: "Thrikkakara Temple"
+  },
+  {
+    area: "Places",
+    question: "The Nehru Trophy snake-boat race is rowed on which lake?",
+    options: ["Punnamada Lake", "Vembanad backwaters at Kollam", "Sasthamkotta Lake", "Ashtamudi Lake"],
+    answer: "Punnamada Lake"
+  },
+  {
+    area: "Places",
+    question: "Pulikali, the tiger dance, is most famously performed in which city?",
+    options: ["Thrissur", "Kozhikode", "Kannur", "Alappuzha"],
+    answer: "Thrissur"
+  },
+
+  // ---- more sadya ----
+  {
+    area: "Sadya",
+    question: "A traditional Onam sadya contains which of these?",
+    options: [
+      "No meat or fish at all",
+      "Fish but no meat",
+      "Chicken as the centrepiece",
+      "Beef on the final day"
+    ],
+    answer: "No meat or fish at all"
+  },
+  {
+    area: "Sadya",
+    question: "How is a sadya traditionally eaten?",
+    options: [
+      "With the right hand, no cutlery",
+      "With a spoon and fork",
+      "With chopsticks carved from palm",
+      "Passed around in a shared bowl"
+    ],
+    answer: "With the right hand, no cutlery"
+  },
+  {
+    area: "Sadya",
+    question: "Upperi, a crisp sadya staple, is made by frying slices of what?",
+    options: ["Raw banana", "Potato", "Jackfruit seed", "Yam leaf"],
+    answer: "Raw banana"
+  },
+
+  // ---- customs and culture ----
+  {
+    area: "Customs",
+    question: "Onakkodi refers to which Onam custom?",
+    options: [
+      "Giving new clothes",
+      "Lighting the first lamp",
+      "Sweeping the courtyard",
+      "Sharing the first harvest"
+    ],
+    answer: "Giving new clothes"
+  },
+  {
+    area: "Customs",
+    question: "The Onavillu, offered at the Padmanabhaswamy Temple, is a ceremonial what?",
+    options: ["Painted bow", "Brass lamp", "Silk umbrella", "Clay drum"],
+    answer: "Painted bow"
+  },
+  {
+    area: "Folk art",
+    question: "Kummattikali dancers are known for wearing masks carved from what?",
+    options: ["Wood", "Beaten copper", "Dried clay", "Woven cane"],
+    answer: "Wood"
+  },
+  {
+    area: "Customs",
+    question: "Beyond Mahabali's return, Onam also celebrates what?",
+    options: [
+      "The harvest",
+      "The start of the monsoon",
+      "A naval victory",
+      "The coronation of a king"
+    ],
+    answer: "The harvest"
+  },
+  {
+    area: "Customs",
+    question: "Vadamvali, one of the Onam games, is which contest?",
+    options: ["Tug of war", "Archery", "Wrestling in mud", "A stilt race"],
+    answer: "Tug of war"
+  },
+  {
+    area: "The legend",
+    question: "The much-loved Onam folk song beginning \"Maveli nadu vaneedum kaalam\" describes what?",
+    options: [
+      "Mahabali's reign, when all were equal",
+      "The building of the first pookalam",
+      "A storm that sank the snake boats",
+      "The founding of Kerala's temples"
+    ],
+    answer: "Mahabali's reign, when all were equal"
   }
 ];
 
