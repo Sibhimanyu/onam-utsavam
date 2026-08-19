@@ -195,14 +195,26 @@ body {
 
 .panel { padding: 6px 22px 24px; }
 
+/* A new subtitle sits above the title on the start screen */
+.subtitle {
+  text-align: center;
+  font-size: 11px;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--gold-text);
+  font-weight: 700;
+  margin: 16px 0 4px;
+}
+
 .title {
   font-family: var(--serif);
-  font-size: 27px;
-  line-height: 1.15;
+  font-size: clamp(28px, 4vw, 40px);
+  line-height: 1.1;
   text-wrap: balance;
   text-align: center;
-  margin: 6px 0 8px;
+  margin: 2px 0 12px;
   color: var(--red);
+  letter-spacing: -0.01em;
 }
 
 .lede {

@@ -65,6 +65,7 @@ function renderProgress() {
 function renderStart() {
   const best = bestScore();
   el.panel.innerHTML = `
+    <p class="subtitle">ഓണാശംസകൾ &middot; Onam 2025</p>
     <h1 class="title">Onam Pookalam Quiz</h1>
     <p class="lede">Ten questions. Every answer lays another ring of flowers.
        Finish the quiz, finish the pookalam.</p>
