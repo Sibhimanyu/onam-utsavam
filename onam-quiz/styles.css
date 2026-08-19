@@ -223,9 +223,10 @@ body {
 .lede {
   text-wrap: pretty;
   text-align: center;
-  font-size: 14px;
-  line-height: 1.55;
-  color: var(--muted);
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--ink);
+  opacity: 0.68;
   margin: 0 0 4px;
 }
 
@@ -289,8 +290,9 @@ body {
 
 .opt:hover:not(:disabled) {
   border-color: var(--marigold);
-  background: #FFFBF2;
+  background: linear-gradient(135deg, #FFFBF0 0%, #FFF6E0 100%);
   transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(240, 140, 0, .12);
 }
 
 /* Browsers grey out disabled button text. After answering, the options are
