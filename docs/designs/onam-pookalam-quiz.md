@@ -206,17 +206,69 @@ Four states, one `render()`, no router:
 State object: `{ screen, index, score, results[] }`. `results[]` holds per-question
 correctness, which is what drives ring colour and what the share-link would encode.
 
-### Catalyst backend (Approach B)
+### Live event mode (host session + QR join)
 
-**Data Store table `Pookalam_Scores`**
+Superseded the single-player-only backend. The host opens a round, the room scans a static QR,
+and the dashboard polls a leaderboard that climbs as people answer. **The graded solo quiz at
+`/` is untouched** — live mode is additive via hash routes, so rubric marks never depend on it.
+
+| Route | Purpose |
+|---|---|
+| `#` (no hash) | the graded single-player quiz |
+| `#host` | dashboard: giant QR, session code, live leaderboard, Start / Close |
+| `#join` | participant flow for a scanned phone |
+
+**Hash routes, not paths.** A hash needs zero server configuration, so it cannot 404 on static
+Slate hosting. That matters when the join URL is encoded in a QR projected in front of a room.
+
+**The QR is a static committed SVG**, generated at dev time with `npx qrcode` — only the image
+ships, so the app still has zero external JavaScript libraries. It points at a fixed `/#join`
+and the *session code is shown separately in large type*. That separation is what lets one
+static QR serve every round: `#join` asks the function which session is currently open.
+
+**Session codes** draw from `ABCDEFGHJKLMNPQRSTUVWXYZ23456789` — no `O`/`0` or `I`/`1`, because
+the code gets read off a projector and typed by hand when a phone camera won't focus.
+
+#### Why not lockstep Kahoot-style
+
+Catalyst allows **10 concurrent executions per function per environment** and returns HTTP 429
+beyond that. Lockstep means every phone polls for the current question index continuously and
+every answer lands in the same instant — 30 devices is straight through the ceiling. Self-paced
+play spreads writes naturally: the dashboard polls at 3s, each player writes once per answer.
+This is a robustness decision, not a laziness one.
+
+### Data Store schema — two tables
+
+**`Pookalam_Scores`** (players; also holds solo scores under `session_code = 'SOLO'`)
 
 | Column | Type | Notes |
 |---|---|---|
-| `player_name` | `varchar(40)` | varchar hard-caps at 255 and silently clamps above it; 40 is safe |
-| `score` | `int` | |
-| `total` | `int` | stored so a future 15-question version stays comparable |
+| `session_code` | `varchar(8)` | `'SOLO'` for single-player runs |
+| `player_name` | `varchar(40)` | varchar hard-caps at 255 and silently clamps above it |
+| `score` | `int` | correct answers so far |
+| `answered` | `int` | questions answered so far — drives the "7/10" progress on the board |
+| `total` | `int` | so a future 15-question version stays comparable |
+
+**`Quiz_Sessions`** (rounds)
+
+| Column | Type | Notes |
+|---|---|---|
+| `session_code` | `varchar(8)` | the 4-char code shown on stage |
+| `session_status` | `varchar(10)` | `'open'` or `'closed'` |
+
+> **Named `session_status`, not `status`.** Catalyst rejects reserved column names — it refuses
+> `priority` with `INVALID_OPERATION: Column name cannot contain reserved keywords`. `status`
+> was not worth the risk of finding out mid-demo.
 
 `ROWID`, `CREATEDTIME`, `CREATORID`, `MODIFIEDTIME` are automatic — **never create them**.
+
+#### ZCQL injection is a real surface here
+
+ZCQL has **no parameter binding**, so every query is built by string concatenation. Session
+codes are therefore *whitelisted* to `/^[A-Z0-9]{1,8}$/` and rejected outright on failure, not
+escaped. Verified live: `GET /board?code=A' OR '1'='1` returns `{"error":"bad code"}` without
+touching the database. Player names never enter a query — they go through `insertRow()`, which
+the SDK parameterises.
 
 **Function `quiz_api` — Advanced I/O, `node24`**
 
