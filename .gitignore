@@ -1,0 +1,5 @@
+# Catalyst function dependencies — reinstalled by the CLI on deploy
+node_modules/
+
+# OS noise
+.DS_Store
