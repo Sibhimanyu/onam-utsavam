@@ -5,13 +5,27 @@
   --cream:     #FBF6EC;
   --paper:     #FFFDF8;
   --earth:     #F2E9D8;
-  --gold:      #C9A227;
-  --red:       #A8201A;
+  --red:       #A8201A;   /* 7.16:1 on paper */
   --marigold:  #F08C00;
-  --green:     #1E5B3A;
+  --green:     #1E5B3A;   /* 7.91:1 on paper */
   --ink:       #2A2118;
-  --muted:     #7A7268;
   --hair:      #E2D9C6;
+
+  /* Two golds, on purpose. The bright one is decoration only — the kasavu
+     border stripe and the progress gradient — where contrast rules don't
+     apply. Gold TEXT needs its own darker value: #C9A227 measured 2.25:1 on
+     cream and 2.38:1 on paper, well under the 4.5:1 WCAG AA floor, and it was
+     being used at 10.5px on the category label. */
+  --gold:      #C9A227;   /* decorative only — never for text */
+  --gold-text: #8A6A10;   /* 4.70:1 cream / 4.98:1 paper */
+
+  /* Darkened from #7A7268, which passed on paper (4.66) but failed on the
+     cream surfaces inside .joinbar (4.40). One value that passes on both. */
+  --muted:     #6F685D;   /* 5.11:1 cream / 5.42:1 paper */
+
+  /* Leaderboard rank numerals were #B4AB9C — 2.11:1 on cream. Still quieter
+     than the player name, but now legible. */
+  --rank:      #8A8275;
 
   --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
   --sans:  -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -162,16 +176,18 @@ body {
 .best {
   text-align: center;
   font-size: 12.5px;
-  color: var(--gold);
+  color: var(--gold-text);
   font-weight: 600;
   margin: 10px 0 0;
 }
 
 .area {
-  font-size: 10.5px;
+  /* Was 10.5px in --gold at 2.38:1 — under both the 4.5:1 contrast floor and
+     the 12px minimum for label text. */
+  font-size: 12px;
   letter-spacing: .14em;
   text-transform: uppercase;
-  color: var(--gold);
+  color: var(--gold-text);
   font-weight: 700;
   margin: 10px 0 6px;
 }
@@ -348,7 +364,7 @@ body {
 
 .row:last-child { border-bottom: 0; }
 .row span:first-child { display: flex; gap: 10px; }
-.rk { color: #B4AB9C; width: 15px; font-style: normal; }
+.rk { color: var(--rank); width: 15px; font-style: normal; }
 
 /* ---------- live event: host dashboard ---------- */
 
