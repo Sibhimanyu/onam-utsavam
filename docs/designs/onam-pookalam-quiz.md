@@ -337,7 +337,27 @@ the score and the finished pookalam. The graded experience must never depend on 
 
 ## Distribution Plan
 
-Catalyst Slate, Development environment, IN DC → `https://<subdomain>.onslate.in`.
+**DEPLOYED AND LIVE 2026-08-19:** https://onam-quiz-tegpgzpi.onslate.in
+
+Function: `https://onam-utsavam-60083782173.development.catalystserverless.in/server/quiz_api/execute`
+
+> **The DC TLD is `.in`, not `.com`.** Every doc example says
+> `*.catalystserverless.com`; on the IN data center that host simply doesn't resolve to your
+> function, and because `leaderboard.js` fails soft the symptom is a silently missing
+> leaderboard with no error anywhere. Take the host verbatim from `catalyst deploy` output and
+> append `/execute`. This cost a redeploy.
+
+Two things that did **not** block the deploy, contrary to the earlier plan:
+- Slate did not need a manual "Start Exploring" click — the first `deploy slate` succeeded.
+- Deploy reported `Build output directory not found. Skipping verification...` and still
+  published correctly. For `framework = "static"` there is no build output dir; the message is
+  noise, not a failure.
+
+Remaining gap: `Pookalam_Scores` does not exist, so `GET /execute` returns
+`{"error":"No such Table with the given name exists."}` with HTTP 500. The quiz is fully
+playable regardless — the leaderboard hides itself. Create the table in the console
+(Data Store → New Table `Pookalam_Scores`, columns `player_name` varchar(40), `score` int,
+`total` int) and it starts working with no redeploy.
 
 Order matters. Do not deviate:
 

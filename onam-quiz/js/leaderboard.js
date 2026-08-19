@@ -18,9 +18,13 @@ const Leaderboard = (() => {
   const LOCAL_HOSTS = ['localhost', '127.0.0.1', ''];
   const isLocal = LOCAL_HOSTS.includes(location.hostname);
 
+  /* Note the .in TLD — this is the IN data center. The docs' generic examples
+     say .catalystserverless.com, which silently fails here. Take the host
+     verbatim from `catalyst deploy` output, then append /execute (the deploy
+     output omits it and the bare URL 404s). */
   const API = isLocal
     ? 'http://localhost:3000/server/quiz_api/execute'
-    : 'https://onam-utsavam-60083782173.development.catalystserverless.com/server/quiz_api/execute';
+    : 'https://onam-utsavam-60083782173.development.catalystserverless.in/server/quiz_api/execute';
 
   const TIMEOUT_MS = 4000;
 
