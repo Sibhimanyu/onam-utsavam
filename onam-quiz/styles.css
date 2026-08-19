@@ -42,9 +42,15 @@ body {
   padding: 24px 16px;
   font-family: var(--sans);
   color: var(--ink);
+  /* Festival floor — warm Onam radials in each corner, like petals scattering.
+     The concentric rings echo the pookalam itself. */
   background:
-    radial-gradient(circle at 50% 0%, #FFF9EC 0%, transparent 60%),
-    var(--cream);
+    radial-gradient(ellipse 90% 60% at 5%  90%,  rgba(240,140,  0,.18) 0%, transparent 55%),
+    radial-gradient(ellipse 80% 50% at 95% 10%,  rgba(201,162, 39,.15) 0%, transparent 55%),
+    radial-gradient(ellipse 60% 50% at 95% 90%,  rgba(168, 32, 26,.07) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 50% at  5% 10%,  rgba( 30, 91, 58,.07) 0%, transparent 50%),
+    radial-gradient(ellipse 120% 40% at 50% 0%,  #FFF4D4              0%, transparent 55%),
+    linear-gradient(160deg, #FEF5E1 0%, #FBF6EC 50%, #F5EDD4 100%);
 }
 
 .stage {
