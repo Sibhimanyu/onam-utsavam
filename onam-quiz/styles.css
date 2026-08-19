@@ -64,11 +64,15 @@ body {
   position: relative;
 }
 
-/* kasavu gold border motif — the single festive flourish */
+/* kasavu gold border motif — traditional Kerala mundum zari stripe.
+   Was dashes at 6px; now a solid chiselled gold band at 12px so it reads
+   as a genuine woven-gold border rather than a decoration. */
 .kasavu {
-  height: 6px;
-  background: repeating-linear-gradient(90deg,
-    var(--gold) 0 10px, transparent 10px 17px);
+  height: 12px;
+  background: linear-gradient(180deg,
+    #EDD040 0%,
+    #C9A227 38%,
+    #9E7D18 100%);
 }
 
 /* ---------- progress ---------- */
