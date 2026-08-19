@@ -85,7 +85,10 @@ const Live = (() => {
           </div>
           <div class="joininfo">
             <p class="joinlabel">Scan to join</p>
-            <p class="joinurl">onam-quiz-tegpgzpi.onslate.in</p>
+            <!-- The ?v= must stay in the typed fallback too. Slate caches
+                 index.html for a year and ignores _headers, so a bare URL can
+                 serve a stale app to any phone that opened it before. -->
+            <p class="joinurl">onam-quiz-tegpgzpi.onslate.in/?v=2#join</p>
             <p class="joinlabel">or enter code</p>
             <p class="joincode">${this.code}</p>
           </div>
