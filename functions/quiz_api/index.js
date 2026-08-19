@@ -36,11 +36,37 @@ const SOLO = 'SOLO';
 const CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 const CODE_LEN = 4;
 
-function sendJson(res, statusCode, data) {
-  /* Only Content-Type. CORS comes from Authorized Domains at the gateway;
-     setting Access-Control-Allow-Origin here too produces a duplicated header
-     that every browser rejects. Localhost is handled separately below. */
-  res.writeHead(statusCode, { 'Content-Type': 'application/json' });
+/* ⚠️ CORS: PICK EXACTLY ONE MECHANISM. Catalyst offers two and they are mutually
+   exclusive — using both yields two Access-Control-Allow-Origin values, which
+   every browser rejects with a CORS error that misleadingly looks like the
+   origin is wrong.
+
+   This function uses Option 2, explicit headers below, because the gateway was
+   verified to inject NOTHING for the Slate origin: a request carrying
+   `Origin: https://onam-quiz-tegpgzpi.onslate.in` returned 200 with no
+   access-control-* header at all, so the browser discarded every response while
+   curl saw success.
+
+   >>> Therefore: do NOT add the Slate domain under Authentication → Authorized
+   >>> Domains. If you ever do, delete this block in the same change. <<< */
+const ALLOWED_ORIGINS = [
+  'https://onam-quiz-tegpgzpi.onslate.in'
+];
+
+function corsOrigin(req) {
+  const origin = req.headers.origin || '';
+  if (ALLOWED_ORIGINS.includes(origin)) return origin;
+  if (/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) return origin;
+  return null;
+}
+
+function sendJson(res, statusCode, data, origin) {
+  const headers = { 'Content-Type': 'application/json' };
+  if (origin) {
+    headers['Access-Control-Allow-Origin'] = origin;
+    headers['Vary'] = 'Origin';
+  }
+  res.writeHead(statusCode, headers);
   res.end(JSON.stringify(data));
 }
 
@@ -113,14 +139,22 @@ async function currentSession(app) {
 }
 
 module.exports = async (req, res) => {
-  // Manual CORS for local dev only. Production origins are covered by
-  // Authorized Domains and must NOT get headers here.
-  const origin = req.headers.origin || '';
-  if (/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-    if (req.method === 'OPTIONS') { res.writeHead(204); return res.end(); }
+  const origin = corsOrigin(req);
+
+  /* Preflight. The browser sends OPTIONS before any POST carrying
+     Content-Type: application/json, and blocks the real request if this
+     does not answer with the right headers. */
+  if (req.method === 'OPTIONS') {
+    const headers = { 'Content-Length': '0' };
+    if (origin) {
+      headers['Access-Control-Allow-Origin'] = origin;
+      headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS';
+      headers['Access-Control-Allow-Headers'] = 'Content-Type';
+      headers['Access-Control-Max-Age'] = '86400';
+      headers['Vary'] = 'Origin';
+    }
+    res.writeHead(204, headers);
+    return res.end();
   }
 
   try {
@@ -138,35 +172,45 @@ module.exports = async (req, res) => {
 
     // ---- host: open a session ----
     if (method === 'POST' && path === '/session/open') {
+      /* Close any round still marked open before starting a new one.
+         Without this, orphans accumulate: a host who forgets to close, or whose
+         browser dies mid-round, leaves an 'open' row forever. Observed live —
+         after closing session 2G7A, /session/current resurfaced 6GEM from an
+         earlier test, so a joiner would have attached to a dead round.
+         Invariant: at most one open session at any time, which matches the
+         "one live round" mental model the host has. */
+      await app.zcql().executeZCQLQuery(
+        `UPDATE ${T_SESSIONS} SET session_status = 'closed' WHERE session_status = 'open'`
+      );
       const code = newCode();
       await app.datastore().table(T_SESSIONS).insertRow({
         session_code: code,
         session_status: 'open'
       });
-      return sendJson(res, 201, { code: code });
+      return sendJson(res, 201, { code: code }, origin);
     }
 
     // ---- host: close a session ----
     if (method === 'POST' && path === '/session/close') {
       const body = await readBody(req);
       const code = safeCode(body.code);
-      if (!code) return sendJson(res, 400, { error: 'bad code' });
+      if (!code) return sendJson(res, 400, { error: 'bad code' }, origin);
       await app.zcql().executeZCQLQuery(
         `UPDATE ${T_SESSIONS} SET session_status = 'closed' WHERE session_code = '${code}'`
       );
-      return sendJson(res, 200, { ok: true, top: await board(app, code) });
+      return sendJson(res, 200, { ok: true, top: await board(app, code) }, origin);
     }
 
     // ---- joiner: which session is live? ----
     if (method === 'GET' && path === '/session/current') {
-      return sendJson(res, 200, { code: await currentSession(app) });
+      return sendJson(res, 200, { code: await currentSession(app) }, origin);
     }
 
     // ---- joiner: claim a slot, get a rowid to update ----
     if (method === 'POST' && path === '/join') {
       const body = await readBody(req);
       const code = safeCode(body.code);
-      if (!code) return sendJson(res, 400, { error: 'bad code' });
+      if (!code) return sendJson(res, 400, { error: 'bad code' }, origin);
       const row = await app.datastore().table(T_PLAYERS).insertRow({
         session_code: code,
         player_name: cleanName(body.name),
@@ -174,44 +218,44 @@ module.exports = async (req, res) => {
         answered: 0,
         total: Number(body.total) || 10
       });
-      return sendJson(res, 201, { rowid: row.ROWID });
+      return sendJson(res, 201, { rowid: row.ROWID }, origin);
     }
 
     // ---- joiner: update my score after each answer ----
     if (method === 'POST' && path === '/score') {
       const body = await readBody(req);
       const rowid = String(body.rowid || '');
-      if (!/^\d+$/.test(rowid)) return sendJson(res, 400, { error: 'bad rowid' });
+      if (!/^\d+$/.test(rowid)) return sendJson(res, 400, { error: 'bad rowid' }, origin);
 
       const total = Number(body.total);
       const score = Number(body.score);
       const answered = Number(body.answered);
       if (!Number.isInteger(total) || total < 1 || total > 100) {
-        return sendJson(res, 400, { error: 'bad total' });
+        return sendJson(res, 400, { error: 'bad total' }, origin);
       }
       if (!Number.isInteger(score) || score < 0 || score > total) {
-        return sendJson(res, 400, { error: 'score out of range' });
+        return sendJson(res, 400, { error: 'score out of range' }, origin);
       }
       if (!Number.isInteger(answered) || answered < score || answered > total) {
-        return sendJson(res, 400, { error: 'answered out of range' });
+        return sendJson(res, 400, { error: 'answered out of range' }, origin);
       }
 
       await app.datastore().table(T_PLAYERS).updateRow({
         ROWID: rowid, score: score, answered: answered
       });
-      return sendJson(res, 200, { ok: true });
+      return sendJson(res, 200, { ok: true }, origin);
     }
 
     // ---- dashboard: leaderboard for a session ----
     if (method === 'GET' && path === '/board') {
       const code = safeCode(query.code);
-      if (!code) return sendJson(res, 400, { error: 'bad code' });
-      return sendJson(res, 200, { top: await board(app, code) });
+      if (!code) return sendJson(res, 400, { error: 'bad code' }, origin);
+      return sendJson(res, 200, { top: await board(app, code) }, origin);
     }
 
     // ---- solo mode: single-player board, kept for the graded flow ----
     if (method === 'GET' && path === '/') {
-      return sendJson(res, 200, { top: await board(app, SOLO) });
+      return sendJson(res, 200, { top: await board(app, SOLO) }, origin);
     }
 
     if (method === 'POST' && path === '/') {
@@ -219,10 +263,10 @@ module.exports = async (req, res) => {
       const total = Number(body.total);
       const score = Number(body.score);
       if (!Number.isInteger(total) || total !== 10) {
-        return sendJson(res, 400, { error: 'total must be 10' });
+        return sendJson(res, 400, { error: 'total must be 10' }, origin);
       }
       if (!Number.isInteger(score) || score < 0 || score > total) {
-        return sendJson(res, 400, { error: 'score out of range' });
+        return sendJson(res, 400, { error: 'score out of range' }, origin);
       }
       await app.datastore().table(T_PLAYERS).insertRow({
         session_code: SOLO,
@@ -231,12 +275,12 @@ module.exports = async (req, res) => {
         answered: total,
         total: total
       });
-      return sendJson(res, 201, { top: await board(app, SOLO) });
+      return sendJson(res, 201, { top: await board(app, SOLO) }, origin);
     }
 
-    return sendJson(res, 404, { error: 'no such route', path: path });
+    return sendJson(res, 404, { error: 'no such route', path: path }, origin);
   } catch (err) {
     console.error('quiz_api failed:', err);
-    return sendJson(res, 500, { error: err.message });
+    return sendJson(res, 500, { error: err.message }, origin);
   }
 };

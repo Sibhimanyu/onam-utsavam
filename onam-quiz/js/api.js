@@ -43,9 +43,17 @@ const Api = (() => {
     }
   }
 
+  /* Deliberately NO 'Content-Type: application/json' header.
+     That value is not CORS-safelisted, so it forces the browser to send a
+     preflight OPTIONS — and the Catalyst API gateway answers OPTIONS itself
+     with 200 and no access-control-* headers, never reaching the function. The
+     preflight then fails and the real POST is never sent.
+     Omitting the header makes fetch default to text/plain;charset=UTF-8, which
+     IS safelisted, so the POST goes straight through as a simple request. The
+     function's body parser reads the raw body and JSON.parses it regardless of
+     content type, so nothing else has to change. */
   const postJson = (path, payload) => call(path, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload)
   });
 

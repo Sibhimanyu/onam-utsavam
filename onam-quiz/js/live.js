@@ -39,6 +39,50 @@ const Live = (() => {
     ));
   }
 
+  /* ---------------- score updates: serialized, latest wins ----------------
+
+     Fire-and-forget updates race. Verified in a real end-to-end run: six rapid
+     answers produced six concurrent POSTs, they completed out of order, and an
+     EARLIER one landed last — the row ended up permanently storing 2/3 when the
+     player had actually scored 5 of 6. Silently wrong scores on the leaderboard.
+
+     So: at most one request in flight, and if newer state arrives while one is
+     running we keep only the newest and send it afterwards. That makes the last
+     write always the true final state, regardless of network ordering. */
+  const updater = {
+    pending: null,
+    inFlight: false,
+
+    queue(rowid, score, answered, total) {
+      this.pending = { rowid, score, answered, total };
+      this.pump();
+    },
+
+    async pump() {
+      if (this.inFlight || !this.pending) return;
+      this.inFlight = true;
+      const s = this.pending;
+      this.pending = null;
+      try {
+        await Api.updateScore(s.rowid, s.score, s.answered, s.total);
+      } finally {
+        this.inFlight = false;
+        if (this.pending) this.pump();
+      }
+    },
+
+    /* Await until the queue is fully drained. Called at the end of a round so
+       the final score is guaranteed committed before we tell the player to
+       look up at the leaderboard. */
+    async flush() {
+      while (this.inFlight || this.pending) {
+        await new Promise(r => setTimeout(r, 120));
+      }
+    },
+
+    reset() { this.pending = null; }
+  };
+
   /* ---------------- host dashboard ---------------- */
 
   const host = {
@@ -88,7 +132,7 @@ const Live = (() => {
             <!-- The ?v= must stay in the typed fallback too. Slate caches
                  index.html for a year and ignores _headers, so a bare URL can
                  serve a stale app to any phone that opened it before. -->
-            <p class="joinurl">onam-quiz-tegpgzpi.onslate.in/?v=2#join</p>
+            <p class="joinurl">onam-quiz-tegpgzpi.onslate.in/?v=4#join</p>
             <p class="joinlabel">or enter code</p>
             <p class="joincode">${this.code}</p>
           </div>
@@ -188,6 +232,7 @@ const Live = (() => {
       this.rowid = res.rowid;
       this.index = 0;
       this.score = 0;
+      updater.reset();
       Pookalam.reset();
       this.renderQuestion();
     },
@@ -243,9 +288,9 @@ const Live = (() => {
       if (correct) this.score++;
       Pookalam.bloomRing(this.index, correct);
       this.renderQuestion(true, opt);
-      /* Fire and forget: the score update must never block the UI. If it fails
-         the player keeps playing and simply lands lower on the board. */
-      Api.updateScore(this.rowid, this.score, this.index + 1, questions.length);
+      /* Queued, not fired directly — see `updater` above. Still never blocks the
+         UI, but writes can no longer land out of order. */
+      updater.queue(this.rowid, this.score, this.index + 1, questions.length);
     },
 
     next() {
@@ -254,10 +299,19 @@ const Live = (() => {
       this.renderQuestion();
     },
 
-    finish() {
+    async finish() {
       document.getElementById('joinBody').innerHTML = `
         <div class="score">${this.score} / ${questions.length}<small>YOUR POOKALAM IS COMPLETE</small></div>
-        <p class="msg">Your score is on the host's leaderboard. Look up.</p>`;
+        <p class="msg" id="finishMsg">Sending your final score&hellip;</p>`;
+
+      /* Wait for the queue to drain, then send one authoritative final write.
+         Without this a player could close the tab mid-flight and be recorded
+         with a stale intermediate score. */
+      await updater.flush();
+      await Api.updateScore(this.rowid, this.score, questions.length, questions.length);
+
+      const msg = document.getElementById('finishMsg');
+      if (msg) msg.textContent = "Your score is on the host's leaderboard. Look up.";
     }
   };
 
