@@ -135,19 +135,22 @@ body {
   .kalam { transition: none; }
 }
 
-.kalam-earth { fill: var(--earth); }
+/* Warmer earth fill — less grey-beige, more turmeric */
+.kalam-earth { fill: #F0E5C8; }
 
+/* Guide rings are now gold-tinted so the un-bloomed pookalam reads as
+   intentional artwork ("ready to bloom") not a loading placeholder. */
 .kalam-guide {
   fill: none;
-  stroke: #E0D5BE;
+  stroke: rgba(201, 162, 39, 0.30);
   stroke-width: 1;
-  stroke-dasharray: 2 5;
+  stroke-dasharray: 3 6;
 }
 
 .kalam-seed {
   fill: none;
-  stroke: #D9CEB6;
-  stroke-width: 1;
+  stroke: rgba(201, 162, 39, 0.22);
+  stroke-width: 1.5;
   stroke-dasharray: 2 3;
   transition: fill .4s ease;
 }
