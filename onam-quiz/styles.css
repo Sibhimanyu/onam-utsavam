@@ -220,6 +220,35 @@ body::before {
   margin: 16px 0 4px;
 }
 
+/* ---------- Maveli character ----------
+
+   King Maveli descends from Vaikuntha every Onam to visit Kerala. He floats
+   gently — his umbrella raised, crown gleaming, garland swaying — on the start
+   screen. The gentle float animation respects prefers-reduced-motion. */
+
+.maveli-wrap {
+  display: flex;
+  justify-content: center;
+  margin: 2px 0 0;
+}
+
+.maveli {
+  width: 80px;
+  height: 128px;
+  filter: drop-shadow(0 6px 16px rgba(201, 162, 39, 0.30));
+  animation: maveli-float 4.5s ease-in-out infinite;
+}
+
+@keyframes maveli-float {
+  0%, 100% { transform: translateY(0)   rotate(-.8deg); }
+  30%       { transform: translateY(-6px) rotate( .5deg); }
+  60%       { transform: translateY(-4px) rotate(-.4deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .maveli { animation: none; }
+}
+
 .title {
   font-family: var(--serif);
   font-size: clamp(28px, 4vw, 40px);

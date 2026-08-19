@@ -62,10 +62,87 @@ function renderProgress() {
     <div class="bar"><i style="width:${pct}%"></i></div>`;
 }
 
+/* King Maveli — the beloved king who descends from Vaikuntha every Onam to
+   visit his people. Drawn as a simple SVG character: umbrella, crown, third eye,
+   garland, mundum gold border. Floats gently to show he has just descended. */
+const MAVELI_SVG = `
+<svg class="maveli" viewBox="0 0 100 160" xmlns="http://www.w3.org/2000/svg"
+     role="img" aria-label="King Maveli, the Onam king">
+  <!-- umbrella stick -->
+  <line x1="50" y1="28" x2="50" y2="68" stroke="#C9A227" stroke-width="3"
+        stroke-linecap="round"/>
+  <!-- umbrella canopy -->
+  <path d="M16 30 Q50 8 84 30 Q67 25 50 27 Q33 25 16 30Z" fill="#C9A227"/>
+  <path d="M16 30 Q33 37 50 27 Q67 37 84 30" fill="none" stroke="#EDD040"
+        stroke-width="1.5" stroke-linecap="round"/>
+  <!-- tassels -->
+  <line x1="28" y1="32" x2="26" y2="42" stroke="#EDD040" stroke-width="1.5"
+        stroke-linecap="round"/>
+  <line x1="72" y1="32" x2="74" y2="42" stroke="#EDD040" stroke-width="1.5"
+        stroke-linecap="round"/>
+  <!-- crown -->
+  <path d="M27 66 L32 55 L37 63 L43 50 L50 61 L57 50 L63 63 L68 55 L73 66Z"
+        fill="#EDD040" stroke="#C9A227" stroke-width="1"/>
+  <!-- crown gems -->
+  <circle cx="43" cy="53" r="2.5" fill="#E05858"/>
+  <circle cx="50" cy="61" r="2.5" fill="#3DBF68"/>
+  <circle cx="57" cy="53" r="2.5" fill="#E05858"/>
+  <!-- head -->
+  <circle cx="50" cy="86" r="19" fill="#C8895A"/>
+  <!-- forehead bindi / third eye -->
+  <ellipse cx="50" cy="80" rx="4.5" ry="3" fill="#A8201A" stroke="#7A1A1A"
+           stroke-width="0.5"/>
+  <circle cx="50" cy="80" r="1.5" fill="#2A0808"/>
+  <!-- eyebrows -->
+  <path d="M40 86 Q44 83 48 84" fill="none" stroke="#5A3520" stroke-width="1.5"
+        stroke-linecap="round"/>
+  <path d="M52 84 Q56 83 60 86" fill="none" stroke="#5A3520" stroke-width="1.5"
+        stroke-linecap="round"/>
+  <!-- eyes -->
+  <ellipse cx="44" cy="89" rx="3" ry="2" fill="#2A1810"/>
+  <ellipse cx="56" cy="89" rx="3" ry="2" fill="#2A1810"/>
+  <circle cx="44.8" cy="88.5" r="1" fill="#fff"/>
+  <circle cx="56.8" cy="88.5" r="1" fill="#fff"/>
+  <!-- smile -->
+  <path d="M43 95 Q50 101 57 95" fill="none" stroke="#5A3520" stroke-width="2"
+        stroke-linecap="round"/>
+  <!-- moustache -->
+  <path d="M43 92 Q47 94 50 92 Q53 94 57 92" fill="none" stroke="#3A2010"
+        stroke-width="1.5" stroke-linecap="round"/>
+  <!-- ears -->
+  <ellipse cx="31" cy="88" rx="4" ry="5" fill="#C8895A"/>
+  <ellipse cx="69" cy="88" rx="4" ry="5" fill="#C8895A"/>
+  <!-- earrings -->
+  <circle cx="31" cy="93" r="2.5" fill="#EDD040"/>
+  <circle cx="69" cy="93" r="2.5" fill="#EDD040"/>
+  <!-- neck -->
+  <path d="M38 106 Q50 101 62 106" stroke="#C8895A" stroke-width="9" fill="none"
+        stroke-linecap="round"/>
+  <!-- body / mundum -->
+  <ellipse cx="50" cy="136" rx="28" ry="22" fill="#F0E8D8"/>
+  <!-- mundum kasavu border -->
+  <path d="M22 155 Q50 162 78 155" stroke="#C9A227" stroke-width="4" fill="none"
+        stroke-linecap="round"/>
+  <!-- garland / mala -->
+  <path d="M37 114 Q50 109 63 114" fill="none" stroke="#F08C00" stroke-width="3"
+        stroke-linecap="round"/>
+  <circle cx="42" cy="114" r="2.5" fill="#F08C00"/>
+  <circle cx="50" cy="110" r="2.5" fill="#F08C00"/>
+  <circle cx="58" cy="114" r="2.5" fill="#F08C00"/>
+  <!-- hands / arms hinting -->
+  <line x1="22" y1="125" x2="14" y2="118" stroke="#C8895A" stroke-width="6"
+        stroke-linecap="round"/>
+  <line x1="78" y1="125" x2="86" y2="118" stroke="#C8895A" stroke-width="6"
+        stroke-linecap="round"/>
+  <!-- blessing hand gesture (right) -->
+  <circle cx="86" cy="116" r="5" fill="#C8895A"/>
+</svg>`;
+
 function renderStart() {
   const best = bestScore();
   el.panel.innerHTML = `
     <p class="subtitle">ഓണാശംസകൾ &middot; Onam 2025</p>
+    <div class="maveli-wrap">${MAVELI_SVG}</div>
     <h1 class="title">Onam Pookalam Quiz</h1>
     <p class="lede">Ten questions. Every answer lays another ring of flowers.
        Finish the quiz, finish the pookalam.</p>
@@ -222,6 +299,9 @@ function restart() {
   state.picked = null;
   state.leaderboard = null;
   state.lbError = false;
+  /* Fresh draw per game: new 10 from the pool, new option order. restart() also
+     runs on boot via route(), so the first game is shuffled too. */
+  newQuiz();
   Pookalam.reset();
   render();
 }
