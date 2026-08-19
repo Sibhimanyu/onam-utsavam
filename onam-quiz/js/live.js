@@ -262,6 +262,11 @@ const Live = (() => {
       this.name = name || 'Anonymous';
       const err = document.getElementById('joinErr');
       err.textContent = 'Joining…';
+      /* Draw this participant's own 10 questions and option order BEFORE the
+         join call, because join reports questions.length as the round total.
+         Everyone gets the same count from the same pool, so the leaderboard
+         stays comparable — but nobody can copy a neighbour's screen. */
+      newQuiz();
       const res = await Api.join(this.code, this.name, questions.length);
       if (!res || !res.rowid) {
         err.textContent = 'Could not join. Ask the host if the round is still open.';
