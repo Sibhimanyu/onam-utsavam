@@ -119,6 +119,14 @@ const Pookalam = {
     this.seed = seed;
   },
 
+  /* How full the pookalam is, 0 -> 1. CSS reads this to grow the artwork from
+     quiet-and-small to large-and-prominent as rings fill, so an empty disc
+     never outranks the question it sits above. */
+  setFill() {
+    const lit = this.svg ? this.svg.querySelectorAll('.ring.bloomed').length : 0;
+    if (this.svg) this.svg.style.setProperty('--kalam-fill', (lit / RING_COUNT).toFixed(3));
+  },
+
   /* Bloom ring `i`. `correct` picks the saturated or muted colour. */
   bloomRing(i, correct) {
     const g = this.rings[i];
@@ -137,6 +145,7 @@ const Pookalam = {
       p.style.strokeWidth = '0.5';
     });
     if (i === 0) this.seed.classList.add('lit');
+    this.setFill();
   },
 
   /* Re-paint an entire result set at once, without animation. Used when
@@ -146,6 +155,6 @@ const Pookalam = {
   },
 
   reset() {
-    if (this.svg) this.build(this.svg);
+    if (this.svg) { this.build(this.svg); this.setFill(); }
   }
 };

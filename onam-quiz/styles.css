@@ -36,9 +36,10 @@
 body {
   margin: 0;
   min-height: 100vh;
+  min-height: 100dvh;
   display: grid;
-  place-items: start center;
-  padding: 26px 16px 60px;
+  place-items: center;
+  padding: 24px 16px;
   font-family: var(--sans);
   color: var(--ink);
   background:
@@ -101,6 +102,20 @@ body {
   width: 240px;
   height: 240px;
   margin: 16px auto 4px;
+  /* Hierarchy: at question 1 the pookalam is an empty 240px disc carrying zero
+     information, yet it was the largest element on screen and pulled the eye
+     before the question. It earns its size as it fills up, so it starts smaller
+     and quieter and grows into prominence.
+     --kalam-fill is set by pookalam.js as rings bloom (0 -> 1). */
+  --kalam-fill: 0;
+  width: calc(180px + 60px * var(--kalam-fill));
+  height: calc(180px + 60px * var(--kalam-fill));
+  opacity: calc(0.55 + 0.45 * var(--kalam-fill));
+  transition: width .5s ease, height .5s ease, opacity .5s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kalam { transition: none; }
 }
 
 .kalam-earth { fill: var(--earth); }
@@ -504,14 +519,41 @@ body {
   letter-spacing: .04em;
 }
 
-/* ---------- mobile: shrink the pookalam so the question stays above the fold ---------- */
+/* ---------- mobile: full-bleed, edge-to-edge, fills the screen ---------- */
 
 @media (max-width: 600px) {
-  body { padding: 14px 12px 40px; }
-  .kalam { width: 176px; height: 176px; margin: 12px auto 2px; }
-  .title { font-size: 24px; }
-  .q { font-size: 17.5px; }
-  .score { font-size: 34px; }
+  body {
+    padding: 0;
+    place-items: start stretch;   /* stage stretches to full width */
+  }
+
+  .stage {
+    max-width: 100%;
+    border-left: 0;
+    border-right: 0;
+    border-radius: 0;
+    box-shadow: none;
+    min-height: 100vh;
+    min-height: 100dvh;   /* dynamic viewport height avoids iOS address-bar gap */
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Let the panel grow into remaining height so no cream shows below the fold */
+  .panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .kalam {
+    width: calc(132px + 44px * var(--kalam-fill));
+    height: calc(132px + 44px * var(--kalam-fill));
+    margin: 10px auto 2px;
+  }
+  .title  { font-size: 24px; }
+  .q      { font-size: 17.5px; }
+  .score  { font-size: 34px; }
 
   /* Host dashboard on a phone: stack the QR above the code rather than
      squeezing them side by side. */
