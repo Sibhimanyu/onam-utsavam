@@ -173,9 +173,9 @@ function renderLeaderboardSlot() {
     const name = document.getElementById('lbName').value.trim() || 'Anonymous';
     state.submitting = true;
     renderLeaderboardSlot();
-    const top = await Leaderboard.submit(name, state.score, questions.length);
+    const res = await Api.soloSubmit(name, state.score, questions.length);
     state.submitting = false;
-    if (top) state.leaderboard = top;
+    if (res && res.top) state.leaderboard = res.top;
     else state.lbError = true;
     renderLeaderboardSlot();
   });
@@ -225,12 +225,41 @@ function restart() {
   render();
 }
 
+/* ---------- routing ---------- */
+
+/* Hash routes, not real paths. A hash needs zero server configuration, so it
+   cannot 404 on static Slate hosting — which matters when the join URL is
+   printed inside a QR code and projected in front of a room.
+
+     (no hash)  the graded single-player quiz — untouched by live mode
+     #host      host dashboard: QR, session code, live leaderboard
+     #join      participant flow for a scanned phone
+*/
+function route() {
+  const hash = (location.hash || '').replace(/^#/, '').toLowerCase();
+  Live.stop();
+
+  if (hash === 'host' || hash === 'join') {
+    el.progress.hidden = true;
+    Pookalam.build(el.kalam);
+    // The host dashboard has no pookalam of its own; hide it there.
+    el.kalam.style.display = (hash === 'host') ? 'none' : '';
+    if (hash === 'host') Live.startHost(el.panel);
+    else Live.startJoin(el.panel);
+    return;
+  }
+
+  el.kalam.style.display = '';
+  Pookalam.build(el.kalam);
+  restart();
+}
+
 /* ---------- boot ---------- */
 
 document.addEventListener('DOMContentLoaded', () => {
   el.progress = document.getElementById('progress');
   el.panel = document.getElementById('panel');
   el.kalam = document.getElementById('kalam');
-  Pookalam.build(el.kalam);
-  render();
+  route();
+  window.addEventListener('hashchange', route);
 });

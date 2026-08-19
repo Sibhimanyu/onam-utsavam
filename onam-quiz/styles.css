@@ -261,6 +261,15 @@ body {
 .btn:hover { background: #8E1A15; transform: translateY(-1px); }
 .btn.small { width: auto; margin: 0; padding: 10px 14px; font-size: 13.5px; }
 
+/* Outline variant. Used for "close the round" so the live leaderboard stays the
+   hero and the round-ending action is harder to hit by accident on stage. */
+.btn.ghost {
+  background: transparent;
+  color: var(--red);
+  border: 1px solid var(--red);
+}
+.btn.ghost:hover { background: #FCF1F0; }
+
 /* ---------- result ---------- */
 
 .score {
@@ -341,6 +350,94 @@ body {
 .row span:first-child { display: flex; gap: 10px; }
 .rk { color: #B4AB9C; width: 15px; font-style: normal; }
 
+/* ---------- live event: host dashboard ---------- */
+
+.host { padding-top: 4px; }
+
+.host-title {
+  font-family: var(--serif);
+  font-size: 26px;
+  text-align: center;
+  color: var(--red);
+  margin: 8px 0 6px;
+}
+
+.joinbar {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  padding: 14px;
+  margin-top: 8px;
+  background: var(--cream);
+  border: 1px solid var(--hair);
+  border-radius: 12px;
+}
+
+.qrwrap {
+  flex: 0 0 auto;
+  background: #fff;
+  padding: 7px;
+  border-radius: 9px;
+  border: 1px solid var(--hair);
+}
+
+.qr { display: block; width: 132px; height: 132px; }
+
+.joininfo { min-width: 0; }
+
+.joinlabel {
+  font-size: 10px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 700;
+  margin: 0 0 3px;
+}
+
+.joinurl {
+  font-size: 12.5px;
+  color: var(--ink);
+  margin: 0 0 10px;
+  word-break: break-all;
+}
+
+/* The code is read off a projector from the back of a room. Big, spaced, mono. */
+.joincode {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 38px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  line-height: 1;
+  color: var(--red);
+  margin: 0;
+}
+
+.lb-live h4 { display: flex; align-items: center; gap: 7px; }
+
+.pulse {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--green);
+  animation: pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes pulse { 0%, 100% { opacity: .25; } 50% { opacity: 1; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .pulse { animation: none; opacity: 1; }
+}
+
+.rs { display: flex; align-items: baseline; gap: 8px; font-weight: 650; }
+
+.prog-dots {
+  font-style: normal;
+  font-size: 10.5px;
+  font-weight: 500;
+  color: var(--muted);
+  letter-spacing: .04em;
+}
+
 /* ---------- mobile: shrink the pookalam so the question stays above the fold ---------- */
 
 @media (max-width: 600px) {
@@ -349,4 +446,21 @@ body {
   .title { font-size: 24px; }
   .q { font-size: 17.5px; }
   .score { font-size: 34px; }
+
+  /* Host dashboard on a phone: stack the QR above the code rather than
+     squeezing them side by side. */
+  .joinbar { flex-direction: column; gap: 12px; text-align: center; }
+  .joininfo { text-align: center; }
+  .qr { width: 168px; height: 168px; }
+  .joincode { font-size: 34px; }
+}
+
+/* Projector mode: on a wide screen the host dashboard gets more room, because
+   this is being read from the back of a room. */
+@media (min-width: 900px) {
+  .stage:has(.host) { max-width: 760px; }
+  .stage:has(.host) .qr { width: 208px; height: 208px; }
+  .stage:has(.host) .joincode { font-size: 60px; }
+  .stage:has(.host) .row { font-size: 17px; padding: 9px 0; }
+  .stage:has(.host) .host-title { font-size: 32px; }
 }
