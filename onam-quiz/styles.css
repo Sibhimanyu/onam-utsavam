@@ -216,6 +216,11 @@ body {
   border: 1px solid var(--hair);
   border-radius: 10px;
   cursor: pointer;
+  /* Guaranteed, not inferred. Options happened to render at 47px from padding
+     alone, but Start Quiz landed at 42px and .btn.small smaller still. A floor
+     means no future copy or font change can quietly drop a control under the
+     44px touch minimum. */
+  min-height: 44px;
   transition: border-color .16s ease, background .16s ease, transform .16s ease;
 }
 
@@ -271,11 +276,12 @@ body {
   border: 0;
   border-radius: 10px;
   cursor: pointer;
+  min-height: 44px;
   transition: background .16s ease, transform .16s ease;
 }
 
 .btn:hover { background: #8E1A15; transform: translateY(-1px); }
-.btn.small { width: auto; margin: 0; padding: 10px 14px; font-size: 13.5px; }
+.btn.small { width: auto; margin: 0; padding: 10px 16px; font-size: 14px; min-height: 44px; }
 
 /* Outline variant. Used for "close the round" so the live leaderboard stays the
    hero and the round-ending action is harder to hit by accident on stage. */
