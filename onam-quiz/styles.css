@@ -455,12 +455,46 @@ body {
   .joincode { font-size: 34px; }
 }
 
-/* Projector mode: on a wide screen the host dashboard gets more room, because
-   this is being read from the back of a room. */
+/* ---------- projector mode ----------
+
+   The host dashboard is not a web page, it is signage. Someone in the back row
+   has to scan the QR with a phone camera and read a 4-character code out loud.
+   Measured before this block existed: on 1920x1080 the card used 40% of the
+   width and 45% of the height, leaving 566px of dead cream, with the QR at
+   208px and its labels at 10px. Unscannable and unreadable past the third row.
+
+   Everything here scales with the viewport rather than using fixed px, so it
+   works on a 1280x720 classroom projector and a 4K screen without new
+   breakpoints. Fallback is graceful: a browser without :has() simply keeps the
+   phone-sized layout instead of breaking. */
 @media (min-width: 900px) {
-  .stage:has(.host) { max-width: 760px; }
-  .stage:has(.host) .qr { width: 208px; height: 208px; }
-  .stage:has(.host) .joincode { font-size: 60px; }
-  .stage:has(.host) .row { font-size: 17px; padding: 9px 0; }
-  .stage:has(.host) .host-title { font-size: 32px; }
+  /* Fill the screen and centre vertically — no dead band under the content. */
+  body:has(.host) { place-items: center; padding: 24px; }
+
+  .stage:has(.host) { max-width: min(1500px, 94vw); width: 100%; }
+  .stage:has(.host) .panel { padding: 10px clamp(24px, 3vw, 56px) clamp(24px, 3vw, 48px); }
+
+  .stage:has(.host) .host-title { font-size: clamp(30px, 3.2vw, 62px); margin-bottom: 14px; }
+
+  .stage:has(.host) .joinbar { gap: clamp(20px, 3vw, 56px); padding: clamp(16px, 2vw, 34px); }
+  .stage:has(.host) .qrwrap { padding: clamp(10px, 1vw, 18px); }
+  .stage:has(.host) .qr {
+    width: clamp(220px, 26vmin, 400px);
+    height: clamp(220px, 26vmin, 400px);
+  }
+
+  .stage:has(.host) .joinlabel { font-size: clamp(12px, 1.15vw, 22px); margin-bottom: 6px; }
+  .stage:has(.host) .joinurl   { font-size: clamp(14px, 1.25vw, 26px); margin-bottom: 18px; }
+  /* The single most important thing on the screen. */
+  .stage:has(.host) .joincode  { font-size: clamp(64px, 8.5vw, 168px); }
+
+  .stage:has(.host) .lb h4     { font-size: clamp(12px, 1.15vw, 22px); }
+  .stage:has(.host) .row       { font-size: clamp(18px, 1.8vw, 36px); padding: clamp(8px, 0.7vw, 16px) 0; }
+  .stage:has(.host) .rk        { width: clamp(20px, 2vw, 40px); }
+  .stage:has(.host) .prog-dots { font-size: clamp(12px, 1vw, 20px); }
+  .stage:has(.host) .lb-note   { font-size: clamp(15px, 1.4vw, 28px); }
+  .stage:has(.host) .btn       { font-size: clamp(16px, 1.3vw, 26px); padding: clamp(12px, 1.1vw, 20px); }
+
+  /* Bigger, so "this board is live" reads from the back of the room. */
+  .stage:has(.host) .pulse { width: clamp(9px, 0.9vw, 18px); height: clamp(9px, 0.9vw, 18px); }
 }
