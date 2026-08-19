@@ -1,31 +1,24 @@
-/* Onam Pookalam Quiz — Kerala festival palette on handloom cream.
+/* Onam Pookalam Quiz — Kerala Night Festival palette.
+   Deep forest green stage, cream text, gold accents, saffron actions.
    No frameworks, no external fonts. System font stack only. */
 
 :root {
-  --cream:     #FBF6EC;
-  --paper:     #FFFDF8;
-  --earth:     #F2E9D8;
-  --red:       #A8201A;   /* 7.16:1 on paper */
-  --marigold:  #F08C00;
-  --green:     #1E5B3A;   /* 7.91:1 on paper */
-  --ink:       #2A2118;
-  --hair:      #E2D9C6;
+  /* Night festival palette. The stage is a deep Kerala forest — dark, lush,
+     lit by festival lamps and the glow of a thousand marigolds. */
+  --cream:     #0C3822;               /* body: deep Kerala forest green */
+  --paper:     rgba(4, 22, 13, 0.55); /* glassy dark panel */
+  --earth:     rgba(201, 162, 39, 0.08); /* subtle gold ground for pookalam */
+  --red:       #E05858;               /* bright for dark bg — semantic error/wrong */
+  --marigold:  #F08C00;               /* saffron — primary CTA and celebration colour */
+  --green:     #3DBF68;               /* bright festive green for correct answers */
+  --ink:       #F0E8D8;               /* warm cream — the main text colour */
+  --hair:      rgba(201, 162, 39, 0.22); /* gold-tinted dividers */
 
-  /* Two golds, on purpose. The bright one is decoration only — the kasavu
-     border stripe and the progress gradient — where contrast rules don't
-     apply. Gold TEXT needs its own darker value: #C9A227 measured 2.25:1 on
-     cream and 2.38:1 on paper, well under the 4.5:1 WCAG AA floor, and it was
-     being used at 10.5px on the category label. */
-  --gold:      #C9A227;   /* decorative only — never for text */
-  --gold-text: #8A6A10;   /* 4.70:1 cream / 4.98:1 paper */
+  --gold:      #C9A227;               /* decorative gold (kasavu, accents) */
+  --gold-text: #DDBA38;               /* brighter gold for text on dark surfaces */
 
-  /* Darkened from #7A7268, which passed on paper (4.66) but failed on the
-     cream surfaces inside .joinbar (4.40). One value that passes on both. */
-  --muted:     #6F685D;   /* 5.11:1 cream / 5.42:1 paper */
-
-  /* Leaderboard rank numerals were #B4AB9C — 2.11:1 on cream. Still quieter
-     than the player name, but now legible. */
-  --rank:      #8A8275;
+  --muted:     rgba(240, 232, 216, 0.60); /* muted cream for secondary text */
+  --rank:      rgba(221, 186, 56, 0.70);  /* gold rank numerals */
 
   --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
   --sans:  -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -42,32 +35,49 @@ body {
   padding: 24px 16px;
   font-family: var(--sans);
   color: var(--ink);
-  /* Festival floor — warm Onam radials in each corner, like petals scattering.
-     The concentric rings echo the pookalam itself. */
+  /* Kerala forest at festival night. Deep green base with glowing lamp-light
+     radials — amber at the corners, a soft gold crown at the top, and a
+     whisper of red at the base where the pookalam rests. */
   background:
-    radial-gradient(ellipse 90% 60% at 5%  90%,  rgba(240,140,  0,.18) 0%, transparent 55%),
-    radial-gradient(ellipse 80% 50% at 95% 10%,  rgba(201,162, 39,.15) 0%, transparent 55%),
-    radial-gradient(ellipse 60% 50% at 95% 90%,  rgba(168, 32, 26,.07) 0%, transparent 50%),
-    radial-gradient(ellipse 60% 50% at  5% 10%,  rgba( 30, 91, 58,.07) 0%, transparent 50%),
-    radial-gradient(ellipse 120% 40% at 50% 0%,  #FFF4D4              0%, transparent 55%),
-    linear-gradient(160deg, #FEF5E1 0%, #FBF6EC 50%, #F5EDD4 100%);
+    radial-gradient(ellipse 70% 55% at  5% 90%, rgba(240,140,  0,.22) 0%, transparent 55%),
+    radial-gradient(ellipse 60% 45% at 95% 10%, rgba(201,162, 39,.18) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 40% at 95% 90%, rgba(168, 32, 26,.12) 0%, transparent 50%),
+    radial-gradient(ellipse 50% 40% at  5% 10%, rgba( 30, 91, 58,.30) 0%, transparent 50%),
+    radial-gradient(ellipse 80%  30% at 50% 0%, rgba(240,180,  0,.08) 0%, transparent 60%),
+    linear-gradient(160deg, #071E10 0%, #0C3822 50%, #071E10 100%);
+}
+
+/* Kasavu frame around the full viewport — every Onam sari has a zari border,
+   so does every screen of the quiz. Suppressed on mobile where the kasavu
+   strip at the top of the stage is the equivalent flourish. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  box-shadow: inset 0 0 0 10px #C9A227,
+              inset 0 0 0 11px #EDD040,
+              inset 0 0 0 14px #9E7D18;
+  pointer-events: none;
+  z-index: 9999;
 }
 
 .stage {
   width: 100%;
   max-width: 460px;
+  /* Glassy dark panel — the stage floats on the festival floor like a lit
+     paal (raised platform) seen through Kerala night air. backdrop-filter
+     softens the gradient behind it into frosted glass. */
   background: var(--paper);
-  /* Warm gold border — the stage frame is part of the festival, not just a
-     container. Inner shadow adds a gentle champfer so the kasavu stripe
-     appears set into the frame rather than floating on top. */
-  border: 1.5px solid rgba(201, 162, 39, 0.55);
-  border-radius: 16px;
+  backdrop-filter: blur(12px) saturate(1.4);
+  -webkit-backdrop-filter: blur(12px) saturate(1.4);
+  border: 1px solid rgba(201, 162, 39, 0.30);
+  border-radius: 20px;
   overflow: hidden;
   box-shadow:
-    0 0 0 5px rgba(201, 162, 39, 0.09),   /* outer gold halo */
-    0 2px 4px rgba(42, 33, 24, .04),
-    0 16px 48px rgba(42, 33, 24, .10),
-    0 40px 80px rgba(168, 32, 26, .04);
+    0 0 0 1px rgba(201, 162, 39, 0.10),
+    0 8px 32px rgba(0, 0, 0, .45),
+    0 32px 64px rgba(0, 0, 0, .30),
+    0 0 80px rgba(201, 162, 39, 0.06);   /* faint gold aura */
   position: relative;
 }
 
@@ -135,23 +145,24 @@ body {
   .kalam { transition: none; }
 }
 
-/* Warmer earth fill — less grey-beige, more turmeric */
-.kalam-earth { fill: #F0E5C8; }
+/* On the dark stage the pookalam is pure light — the earth disc becomes a
+   subtle glowing gold and the guide rings are visible gold dashes. When petals
+   bloom in their saturated festival colours they shine like lamp flames
+   against the deep green. */
+.kalam-earth { fill: rgba(201, 162, 39, 0.06); }
 
-/* Guide rings are now gold-tinted so the un-bloomed pookalam reads as
-   intentional artwork ("ready to bloom") not a loading placeholder. */
 .kalam-guide {
   fill: none;
-  stroke: rgba(201, 162, 39, 0.30);
+  stroke: rgba(221, 186, 56, 0.45);
   stroke-width: 1;
-  stroke-dasharray: 3 6;
+  stroke-dasharray: 3 7;
 }
 
 .kalam-seed {
   fill: none;
-  stroke: rgba(201, 162, 39, 0.22);
+  stroke: rgba(221, 186, 56, 0.35);
   stroke-width: 1.5;
-  stroke-dasharray: 2 3;
+  stroke-dasharray: 2 4;
   transition: fill .4s ease;
 }
 
@@ -216,7 +227,9 @@ body {
   text-wrap: balance;
   text-align: center;
   margin: 2px 0 12px;
-  color: var(--red);
+  /* Cream on dark: red (#A8201A) doesn't have enough luminance contrast on the
+     dark glassy stage. Cream is legible and matches the handloom aesthetic. */
+  color: var(--ink);
   letter-spacing: -0.01em;
 }
 
@@ -289,10 +302,10 @@ body {
 }
 
 .opt:hover:not(:disabled) {
-  border-color: var(--marigold);
-  background: linear-gradient(135deg, #FFFBF0 0%, #FFF6E0 100%);
+  border-color: rgba(221, 186, 56, 0.55);
+  background: rgba(201, 162, 39, 0.10);
   transform: translateY(-1px);
-  box-shadow: 0 3px 10px rgba(240, 140, 0, .12);
+  box-shadow: 0 3px 14px rgba(201, 162, 39, 0.18);
 }
 
 /* Browsers grey out disabled button text. After answering, the options are
@@ -312,9 +325,9 @@ body {
   color: var(--muted);
 }
 
-.opt.good { border-color: var(--green); background: #F1F7F2; }
-.opt.good .k { background: var(--green); border-color: var(--green); color: #fff; }
-.opt.bad  { border-color: var(--red); background: #FCF1F0; }
+.opt.good { border-color: var(--green); background: rgba(61, 191, 104, 0.14); }
+.opt.good .k { background: var(--green); border-color: var(--green); color: #071E10; }
+.opt.bad  { border-color: var(--red); background: rgba(224, 88, 88, 0.12); }
 .opt.bad .k { background: var(--red); border-color: var(--red); color: #fff; }
 .opt.dim  { opacity: .5; }
 
@@ -333,7 +346,7 @@ body {
    :focus-visible (not :focus) so a mouse click never paints a ring, only
    keyboard navigation does. */
 :where(.opt, .btn, .lb-form input, button):focus-visible {
-  outline: 2px solid var(--red);
+  outline: 2px solid var(--gold-text);
   outline-offset: 2px;
   border-radius: 10px;
 }
@@ -348,21 +361,23 @@ body {
   font: inherit;
   font-size: 14.5px;
   font-weight: 700;
-  letter-spacing: .04em;
-  color: #fff;
-  background: linear-gradient(160deg, #C5301A 0%, #A8201A 100%);
+  letter-spacing: .05em;
+  /* Saffron/marigold — the colour of Onam garlands and festival lamps.
+     On a dark green stage it glows like a lit diya. */
+  color: #071E10;
+  background: linear-gradient(160deg, #F5960A 0%, #E07A00 100%);
   border: 0;
   border-radius: 10px;
   cursor: pointer;
   min-height: 44px;
-  box-shadow: 0 4px 16px rgba(168, 32, 26, .28), inset 0 1px 0 rgba(255,255,255,.12);
+  box-shadow: 0 4px 20px rgba(240, 140, 0, .40), inset 0 1px 0 rgba(255,255,255,.20);
   transition: background .16s ease, transform .16s ease, box-shadow .16s ease;
 }
 
 .btn:hover {
-  background: linear-gradient(160deg, #A82818 0%, #8E1A15 100%);
+  background: linear-gradient(160deg, #E08800 0%, #C87000 100%);
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(168, 32, 26, .34), inset 0 1px 0 rgba(255,255,255,.12);
+  box-shadow: 0 6px 24px rgba(240, 140, 0, .50), inset 0 1px 0 rgba(255,255,255,.20);
 }
 .btn.small { width: auto; margin: 0; padding: 10px 16px; font-size: 14px; min-height: 44px; }
 
@@ -370,10 +385,10 @@ body {
    hero and the round-ending action is harder to hit by accident on stage. */
 .btn.ghost {
   background: transparent;
-  color: var(--red);
-  border: 1px solid var(--red);
+  color: var(--gold-text);
+  border: 1px solid rgba(221, 186, 56, 0.45);
 }
-.btn.ghost:hover { background: #FCF1F0; }
+.btn.ghost:hover { background: rgba(221, 186, 56, 0.10); }
 
 /* ---------- result ---------- */
 
@@ -470,7 +485,7 @@ body {
   text-wrap: balance;
   font-size: 26px;
   text-align: center;
-  color: var(--red);
+  color: var(--ink);
   margin: 8px 0 6px;
 }
 
@@ -513,7 +528,8 @@ body {
   word-break: break-all;
 }
 
-/* The code is read off a projector from the back of a room. Big, spaced, mono. */
+/* The code is read off a projector from the back of a room. Big, spaced, mono.
+   Gold on dark — far more legible than red at distance. */
 .joincode {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-variant-numeric: tabular-nums;
@@ -521,7 +537,7 @@ body {
   font-weight: 700;
   letter-spacing: .14em;
   line-height: 1;
-  color: var(--red);
+  color: var(--gold-text);
   margin: 0;
 }
 
@@ -567,11 +583,17 @@ body {
     place-items: start stretch;   /* stage stretches to full width */
   }
 
+  /* The kasavu viewport frame would double with the kasavu strip at the top
+     of the full-bleed stage — suppress it on mobile. */
+  body::before { display: none; }
+
   .stage {
     max-width: 100%;
     border-left: 0;
     border-right: 0;
     border-radius: 0;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
     box-shadow: none;
     min-height: 100vh;
     min-height: 100dvh;   /* dynamic viewport height avoids iOS address-bar gap */
@@ -637,13 +659,14 @@ body {
   }
 
   /* Pookalam spans rows 2–3 so it centres vertically against both the
-     progress bar and the panel content beside it */
+     progress bar and the panel content beside it. Sized up on dark so it
+     glows like a lamp — 38vmin gives generous presence without crowding. */
   .stage:not(:has(.host)) .kalam {
     grid-column: 1;
     grid-row: 2 / 4;
-    width: clamp(180px, 26vmin, 320px);
-    height: clamp(180px, 26vmin, 320px);
-    margin: 0 12px 0 24px;
+    width: clamp(220px, 38vmin, 420px);
+    height: clamp(220px, 38vmin, 420px);
+    margin: 0 16px 0 28px;
     align-self: center;
     justify-self: center;
   }
@@ -652,8 +675,8 @@ body {
   .stage:not(:has(.host)) .panel {
     grid-column: 2;
     grid-row: 3;
-    padding: 8px 28px 32px;
-    border-left: 1px solid var(--hair);
+    padding: 12px 32px 36px;
+    border-left: 1px solid rgba(201, 162, 39, 0.15);
     display: flex;
     flex-direction: column;
     justify-content: center;
