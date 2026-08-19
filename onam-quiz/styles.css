@@ -563,6 +563,63 @@ body {
   .joincode { font-size: 34px; }
 }
 
+/* ---------- desktop: two-column layout — pookalam left, panel right ----------
+
+   Above 640px the narrow card is replaced by a side-by-side grid. The pookalam
+   (which doubles as score feedback) gets a generous left column; the question
+   or start content fills the right column. Both areas scale with vmin so the
+   balance holds from a 13" laptop to a wide monitor.
+
+   :has() fallback: browsers without :has() keep the mobile single-column layout
+   rather than breaking — acceptable on older browsers. */
+@media (min-width: 640px) {
+  /* Solo quiz, result screen, and join participant — anything that isn't the
+     full-screen host projector view — get the two-column treatment. */
+  .stage:not(:has(.host)) {
+    max-width: min(880px, 93vw);
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto 1fr;
+  }
+
+  /* Kasavu gold strip runs the full width above both columns */
+  .stage:not(:has(.host)) .kasavu {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+
+  /* Progress bar sits in the right column, above the panel */
+  .stage:not(:has(.host)) #progress {
+    grid-column: 2;
+    grid-row: 2;
+    padding: 20px 28px 0;
+    border-left: 1px solid var(--hair);
+  }
+
+  /* Pookalam spans rows 2–3 so it centres vertically against both the
+     progress bar and the panel content beside it */
+  .stage:not(:has(.host)) .kalam {
+    grid-column: 1;
+    grid-row: 2 / 4;
+    width: clamp(180px, 26vmin, 320px);
+    height: clamp(180px, 26vmin, 320px);
+    margin: 0 12px 0 24px;
+    align-self: center;
+    justify-self: center;
+  }
+
+  /* Panel is right column, bottom row. flex column so children stack naturally */
+  .stage:not(:has(.host)) .panel {
+    grid-column: 2;
+    grid-row: 3;
+    padding: 8px 28px 32px;
+    border-left: 1px solid var(--hair);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+}
+
 /* ---------- projector mode ----------
 
    The host dashboard is not a web page, it is signage. Someone in the back row

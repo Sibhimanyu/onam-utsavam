@@ -184,8 +184,46 @@ const Live = (() => {
     name: '',
     index: 0,
     score: 0,
+    ended: false,
+    watchTimer: null,
+
+    /* While a player is answering, poll their own session's status so a host
+       "close" reaches this phone live — otherwise they keep tapping through a
+       round nobody is watching and their finish screen lands on a dead board. */
+    startWatch() {
+      this.stopWatch();
+      this.watchTimer = setInterval(() => this.checkSession(), POLL_MS);
+    },
+
+    stopWatch() {
+      if (this.watchTimer) { clearInterval(this.watchTimer); this.watchTimer = null; }
+    },
+
+    async checkSession() {
+      if (this.ended || !this.code) return;
+      const res = await Api.sessionStatus(this.code);
+      /* A null is a transient network blip — keep playing and retry next tick.
+         Only an explicit non-open status ends the round for this player. */
+      if (res && res.status && res.status !== 'open') this.endedByHost();
+    },
+
+    endedByHost() {
+      if (this.ended) return;
+      this.ended = true;
+      this.stopWatch();
+      updater.reset();
+      const played = this.rowid != null;
+      document.getElementById('joinBody').innerHTML = `
+        <h1 class="title">The round has ended</h1>
+        <p class="lede">The host closed this quiz.${played
+          ? ` Your final score is <strong>${this.score} / ${questions.length}</strong>.`
+          : ''}</p>
+        <p class="msg">Look up at the host's screen for the final standings.</p>`;
+    },
 
     async mount(root) {
+      this.stopWatch();
+      this.ended = false;
       root.innerHTML = `<div id="joinBody"><p class="lede">Looking for a live quiz…</p></div>`;
       const res = await Api.currentSession();
       const body = document.getElementById('joinBody');
@@ -232,8 +270,10 @@ const Live = (() => {
       this.rowid = res.rowid;
       this.index = 0;
       this.score = 0;
+      this.ended = false;
       updater.reset();
       Pookalam.reset();
+      this.startWatch();
       this.renderQuestion();
     },
 
@@ -300,6 +340,9 @@ const Live = (() => {
     },
 
     async finish() {
+      /* Player reached the end on their own — stop watching so a later host
+         close doesn't replace their completed screen with the ended notice. */
+      this.stopWatch();
       document.getElementById('joinBody').innerHTML = `
         <div class="score">${this.score} / ${questions.length}<small>YOUR POOKALAM IS COMPLETE</small></div>
         <p class="msg" id="finishMsg">Sending your final score&hellip;</p>`;
@@ -318,8 +361,8 @@ const Live = (() => {
   /* ---------------- entry ---------------- */
 
   return {
-    startHost(root) { stopPolling(); host.mount(root); },
+    startHost(root) { stopPolling(); join.stopWatch(); host.mount(root); },
     startJoin(root) { stopPolling(); join.mount(root); },
-    stop() { stopPolling(); }
+    stop() { stopPolling(); join.stopWatch(); }
   };
 })();

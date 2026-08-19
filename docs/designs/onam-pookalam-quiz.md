@@ -256,6 +256,12 @@ This is a robustness decision, not a laziness one.
 | `session_code` | `varchar(8)` | the 4-char code shown on stage |
 | `session_status` | `varchar(10)` | `'open'` or `'closed'` |
 
+**Closing a round reaches every phone live.** When the host closes a session, players still
+mid-quiz poll `GET /session/status?code=XXXX` (3s, the same cadence as the dashboard) and, on any
+non-`open` status, stop answering and show a "the round has ended" screen with their final score.
+Scoped to the player's own code — not `currentSession()` — so opening a fresh round elsewhere
+still reads as closed for the old one instead of silently attaching the player to a stranger's.
+
 > **Named `session_status`, not `status`.** Catalyst rejects reserved column names — it refuses
 > `priority` with `INVALID_OPERATION: Column name cannot contain reserved keywords`. `status`
 > was not worth the risk of finding out mid-demo.

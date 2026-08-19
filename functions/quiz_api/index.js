@@ -10,6 +10,7 @@
  *   POST /session/open              -> { code }            host starts a round
  *   POST /session/close  {code}     -> { ok }               host freezes the board
  *   GET  /session/current           -> { code | null }      what a joiner attaches to
+ *   GET  /session/status?code=XXXX  -> { status }            open|closed|gone for one code
  *   POST /join    {code, name}      -> { rowid }            claim a slot
  *   POST /score   {rowid, score, answered, total} -> { ok } per-answer update
  *   GET  /board?code=XXXX           -> { top: [...] }       leaderboard
@@ -204,6 +205,23 @@ module.exports = async (req, res) => {
     // ---- joiner: which session is live? ----
     if (method === 'GET' && path === '/session/current') {
       return sendJson(res, 200, { code: await currentSession(app) }, origin);
+    }
+
+    // ---- joiner: is MY session still live? ----
+    /* A player mid-round polls this so a host "close" reaches their phone live,
+       instead of them answering into a round nobody is watching. Scoped to their
+       own code, not currentSession(), so opening a fresh round elsewhere still
+       reads as 'closed' for the old one rather than resurfacing a stranger's. */
+    if (method === 'GET' && path === '/session/status') {
+      const code = safeCode(query.code);
+      if (!code) return sendJson(res, 400, { error: 'bad code' }, origin);
+      const rows = await app.zcql().executeZCQLQuery(
+        `SELECT session_status FROM ${T_SESSIONS} ` +
+        `WHERE session_code = '${code}' ORDER BY ROWID DESC LIMIT 0, 1`
+      );
+      const list = unwrap(rows, T_SESSIONS);
+      const status = list.length ? list[0].session_status : 'gone';
+      return sendJson(res, 200, { status: status }, origin);
     }
 
     // ---- joiner: claim a slot, get a rowid to update ----

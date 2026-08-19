@@ -65,6 +65,7 @@ const Api = (() => {
 
     // --- participant ---
     currentSession()     { return call('/session/current', { method: 'GET' }); },
+    sessionStatus(code)  { return call('/session/status?code=' + encodeURIComponent(code), { method: 'GET' }); },
     join(code, name, total) { return postJson('/join', { code, name, total }); },
     updateScore(rowid, score, answered, total) {
       return postJson('/score', { rowid, score, answered, total });
