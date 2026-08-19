@@ -342,20 +342,26 @@ body {
   display: block;
   width: 100%;
   margin-top: 14px;
-  padding: 12px;
+  padding: 13px 16px;
   font: inherit;
-  font-size: 15px;
-  font-weight: 650;
+  font-size: 14.5px;
+  font-weight: 700;
+  letter-spacing: .04em;
   color: #fff;
-  background: var(--red);
+  background: linear-gradient(160deg, #C5301A 0%, #A8201A 100%);
   border: 0;
   border-radius: 10px;
   cursor: pointer;
   min-height: 44px;
-  transition: background .16s ease, transform .16s ease;
+  box-shadow: 0 4px 16px rgba(168, 32, 26, .28), inset 0 1px 0 rgba(255,255,255,.12);
+  transition: background .16s ease, transform .16s ease, box-shadow .16s ease;
 }
 
-.btn:hover { background: #8E1A15; transform: translateY(-1px); }
+.btn:hover {
+  background: linear-gradient(160deg, #A82818 0%, #8E1A15 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(168, 32, 26, .34), inset 0 1px 0 rgba(255,255,255,.12);
+}
 .btn.small { width: auto; margin: 0; padding: 10px 16px; font-size: 14px; min-height: 44px; }
 
 /* Outline variant. Used for "close the round" so the live leaderboard stays the
