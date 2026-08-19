@@ -337,9 +337,14 @@ body {
 .lb-form input {
   flex: 1;
   min-width: 0;
-  padding: 10px 12px;
+  padding: 11px 12px;
   font: inherit;
-  font-size: 14px;
+  /* 16px is a hard floor, not a taste call: iOS Safari auto-zooms the whole
+     page when a focused input is under 16px. This is the participant typing
+     their name on a phone, so the zoom would throw away their context at the
+     worst moment. */
+  font-size: 16px;
+  min-height: 44px;
   border: 1px solid var(--hair);
   border-radius: 9px;
   background: var(--paper);
