@@ -266,6 +266,13 @@ still reads as closed for the old one instead of silently attaching the player t
 > `priority` with `INVALID_OPERATION: Column name cannot contain reserved keywords`. `status`
 > was not worth the risk of finding out mid-demo.
 
+**Session codes are globally unique, not just unique-among-open.** `/session/open` regenerates
+the code until it is unused across *all* history (closed rows live forever). This is a correctness
+invariant, not cosmetics: `board()` scopes players by `session_code` alone, so a reused code would
+merge a past round's players into a live leaderboard. The leaderboard itself orders by
+`score DESC, answered DESC, ROWID ASC` — deterministic so equal scores don't flicker between polls,
+and finishing more questions breaks the tie.
+
 `ROWID`, `CREATEDTIME`, `CREATORID`, `MODIFIEDTIME` are automatic — **never create them**.
 
 #### ZCQL injection is a real surface here

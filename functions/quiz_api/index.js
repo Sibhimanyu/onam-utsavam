@@ -116,16 +116,21 @@ function cleanName(raw) {
 /* Raw ZCQL rows arrive wrapped under the table-name key. Forgetting this unwrap
    is the single most common Data Store bug. */
 function unwrap(rows, table) {
-  return rows.map(r => r[table]).filter(Boolean);
+  return (rows || []).map(r => r[table]).filter(Boolean);
 }
 
 async function board(app, code) {
   const zcql = app.zcql();
   /* No AS aliases — ZCQL silently drops them and returns the original column
      name. Well inside the 300-row ZCQL ceiling. */
+  /* ORDER BY score alone leaves ties in an undefined order that can reorder
+     between two 3s polls — visible flicker on the projector. The extra keys make
+     it deterministic AND meaningful: on equal score, whoever answered more ranks
+     higher, and ROWID (join order) is the final, stable tiebreak. */
   const rows = await zcql.executeZCQLQuery(
     `SELECT player_name, score, answered, total FROM ${T_PLAYERS} ` +
-    `WHERE session_code = '${code}' ORDER BY score DESC LIMIT 0, ${BOARD_LIMIT}`
+    `WHERE session_code = '${code}' ` +
+    `ORDER BY score DESC, answered DESC, ROWID ASC LIMIT 0, ${BOARD_LIMIT}`
   );
   return unwrap(rows, T_PLAYERS);
 }
@@ -183,7 +188,22 @@ module.exports = async (req, res) => {
       await app.zcql().executeZCQLQuery(
         `UPDATE ${T_SESSIONS} SET session_status = 'closed' WHERE session_status = 'open'`
       );
-      const code = newCode();
+      /* The code must be unique across ALL history, not just open rows.
+         board() scopes players by session_code alone, and closed sessions live
+         forever, so reusing a past code would merge that old round's players
+         into this live board. Regenerate until the code is unused. The candidate
+         is drawn from CODE_ALPHABET (⊂ [A-Z0-9]), so it is safe to interpolate.
+         8 collisions across a 32^4 (~1M) space is astronomically unlikely; if it
+         somehow happens we degrade to an unchecked code rather than loop forever. */
+      let code = null;
+      for (let attempt = 0; attempt < 8; attempt++) {
+        const candidate = newCode();
+        const existing = await app.zcql().executeZCQLQuery(
+          `SELECT ROWID FROM ${T_SESSIONS} WHERE session_code = '${candidate}' LIMIT 0, 1`
+        );
+        if (!existing || existing.length === 0) { code = candidate; break; }
+      }
+      if (!code) code = newCode();
       await app.datastore().table(T_SESSIONS).insertRow({
         session_code: code,
         session_status: 'open'
@@ -229,12 +249,18 @@ module.exports = async (req, res) => {
       const body = await readBody(req);
       const code = safeCode(body.code);
       if (!code) return sendJson(res, 400, { error: 'bad code' }, origin);
+      /* Clamp total to the same [1,100] range /score enforces. Without this a
+         garbage total would be stored and then surface in the "answered/total"
+         board display and drive the progress bar out of bounds. */
+      const joinTotal = Number(body.total);
+      const total = (Number.isInteger(joinTotal) && joinTotal >= 1 && joinTotal <= 100)
+        ? joinTotal : 10;
       const row = await app.datastore().table(T_PLAYERS).insertRow({
         session_code: code,
         player_name: cleanName(body.name),
         score: 0,
         answered: 0,
-        total: Number(body.total) || 10
+        total: total
       });
       return sendJson(res, 201, { rowid: row.ROWID }, origin);
     }
