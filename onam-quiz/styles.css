@@ -125,6 +125,17 @@ body::after {
   transition: width .45s cubic-bezier(.4, 0, .2, 1);
 }
 
+/* Inline running score — appears after the first answer so it never shows
+   "0 correct" on a fresh question. Small and low-contrast so it doesn't
+   compete with the question number beside it. */
+.score-hint {
+  font-size: 11px;
+  color: var(--green);
+  font-weight: 600;
+  margin-left: 6px;
+  opacity: 0.85;
+}
+
 /* ---------- pookalam ---------- */
 
 .kalam {
@@ -207,6 +218,22 @@ body::after {
 /* ---------- panel ---------- */
 
 .panel { padding: 6px 22px 24px; }
+
+/* Panel fades and slides in whenever render() replaces its content.
+   The JS removes the class, forces reflow, then re-adds it so the animation
+   restarts cleanly on every question change. */
+.panel.fade-in {
+  animation: panel-arrive .22s cubic-bezier(.25, .46, .45, .94) both;
+}
+
+@keyframes panel-arrive {
+  from { opacity: 0; transform: translateY(7px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel.fade-in { animation: none; }
+}
 
 /* A new subtitle sits above the title on the start screen */
 .subtitle {
@@ -465,6 +492,22 @@ body::after {
 }
 
 /* ---------- result ---------- */
+
+/* Share + Play Again sit side by side — sharing is always available but the
+   primary action (play again) is the red solid button on the right. */
+.result-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.result-actions .btn {
+  flex: 1;
+  width: auto;
+  margin-top: 0;
+  font-size: 13.5px;
+  padding: 12px 10px;
+}
 
 /* Score bounces in with a springy entrance — the result feels like an event,
    not a page render. A single iteration: once it lands, it stays. */

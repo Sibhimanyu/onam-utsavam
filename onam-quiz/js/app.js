@@ -54,9 +54,14 @@ function renderProgress() {
   const n = state.index + 1;
   const total = questions.length;
   const pct = Math.round((n / total) * 100);
+  /* Running score — show after at least one answered question so the label
+     doesn't read "0 correct" on the very first question before any answer. */
+  const scoreHint = state.index > 0 || state.screen === 'feedback'
+    ? `<span class="score-hint">&#10003; ${state.score} correct</span>`
+    : '';
   el.progress.innerHTML = `
     <div class="progress-row">
-      <span>Question ${n} of ${total}</span>
+      <span>Question ${n} of ${total} ${scoreHint}</span>
       <span>${pct}%</span>
     </div>
     <div class="bar"><i style="width:${pct}%"></i></div>`;
@@ -216,11 +221,28 @@ function renderResult() {
   el.panel.innerHTML = `
     <div class="score">${state.score} / ${total}<small>YOUR POOKALAM IS COMPLETE</small></div>
     <p class="msg">${scoreMessage(state.score, total)}</p>
-    ${best > state.score ? `<p class="best">Your best is still ${best} / ${total}</p>` : ''}
+    ${best > state.score ? `<p class="best">&#9733; Your best is still ${best} / ${total}</p>` : ''}
     <div id="lbSlot"></div>
-    <button class="btn" id="againBtn">Play Again</button>`;
+    <div class="result-actions">
+      <button class="btn ghost share-btn" id="shareBtn">&#x1F517; Share Score</button>
+      <button class="btn" id="againBtn">&#9654; Play Again</button>
+    </div>`;
 
   document.getElementById('againBtn').addEventListener('click', restart);
+  document.getElementById('shareBtn').addEventListener('click', () => {
+    const petal = state.score === total ? 'complete! Every ring in full bloom.' : `${state.score} rings deep.`;
+    const text = `I scored ${state.score}/${total} on the Onam Pookalam Quiz! 🌸 My pookalam is ${petal}\nTry it: https://onam-quiz-tegpgzpi.onslate.in`;
+    const btn = document.getElementById('shareBtn');
+    if (navigator.share) {
+      navigator.share({ text }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(text).then(() => {
+        if (btn) { btn.innerHTML = '&#10003; Copied!'; setTimeout(() => { if (btn) btn.innerHTML = '&#x1F517; Share Score'; }, 2000); }
+      }).catch(() => {
+        if (btn) btn.innerHTML = '&#10003; Score: ' + state.score + '/' + total;
+      });
+    }
+  });
   renderLeaderboardSlot();
 }
 
@@ -276,6 +298,13 @@ function renderLeaderboardSlot() {
 }
 
 function render() {
+  /* Restart the panel's fade-in animation on every render so content
+     changes feel like arrivals, not instant swaps. The offsetHeight read
+     forces a reflow so the browser sees the class removal before re-adding. */
+  el.panel.classList.remove('fade-in');
+  void el.panel.offsetHeight;
+  el.panel.classList.add('fade-in');
+
   renderProgress();
   if (state.screen === 'start') renderStart();
   else if (state.screen === 'result') renderResult();
@@ -350,6 +379,35 @@ function route() {
   Pookalam.build(el.kalam);
   restart();
 }
+
+/* ---------- keyboard shortcuts ----------
+
+   On desktop a quiz is much faster when you can keep your hands on keys.
+   Keys A/B/C/D or 1/2/3/4 click the corresponding option.
+   Enter or Space advance to the next question / start the quiz. */
+
+document.addEventListener('keydown', e => {
+  /* Ignore while the user is typing in an input field */
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+  if (state.screen === 'question') {
+    const KEY_MAP = { a: 0, '1': 0, b: 1, '2': 1, c: 2, '3': 2, d: 3, '4': 3 };
+    const idx = KEY_MAP[e.key.toLowerCase()];
+    if (idx !== undefined) {
+      const opts = el.panel.querySelectorAll('.opt:not(:disabled)');
+      if (opts[idx]) { e.preventDefault(); opts[idx].click(); }
+      return;
+    }
+  }
+
+  if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault();
+    const btn = document.getElementById('nextBtn')
+               || document.getElementById('startBtn')
+               || document.getElementById('againBtn');
+    if (btn) btn.click();
+  }
+});
 
 /* ---------- boot ---------- */
 
