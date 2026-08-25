@@ -32,18 +32,54 @@ function ringSpec(i) {
   return { base, count, length: 11, halfWidth: 3.6, colour: PALETTE[i % PALETTE.length] };
 }
 
-/* Faint concentric guide circles, like the chalk lines an artist lays down
-   before placing any flowers. Reads as "prepared ground" rather than the
-   loading-skeleton look that plain dashed petal outlines produce. */
+/* Full kolam guide art — all ring boundaries + 12 radial spokes + a small
+   six-petal lotus at the intersection of every spoke.
+
+   This is how a pookalam artist actually prepares the ground: chalk circles for
+   ring boundaries, then lines dividing each ring into equal sections, then small
+   flower marks at every intersection so each petal has an anchor point. The
+   result reads as "rich craft-work in progress", not a plain bullseye. */
 function addGuides(svg) {
-  for (let i = 1; i < RING_COUNT; i += 3) {
-    const r = 12 + i * 10 + 5;
+  /* All 11 ring boundaries (inner edge of each ring + outer boundary of ring 10) */
+  for (let i = 0; i <= RING_COUNT; i++) {
+    const r = i === RING_COUNT ? 114 : 12 + i * 10;
     const c = document.createElementNS(NS, 'circle');
     c.setAttribute('cx', CENTRE);
     c.setAttribute('cy', CENTRE);
     c.setAttribute('r', r);
     c.setAttribute('class', 'kalam-guide');
     svg.appendChild(c);
+  }
+
+  /* 12 radial spokes at 30° intervals — divides each ring into 12 petal cells.
+     Starting at -90° (12 o'clock) so a spoke always points straight up. */
+  for (let deg = 0; deg < 360; deg += 30) {
+    const θ = (deg - 90) * Math.PI / 180;
+    const line = document.createElementNS(NS, 'line');
+    line.setAttribute('x1', CENTRE);
+    line.setAttribute('y1', CENTRE);
+    line.setAttribute('x2', +(CENTRE + Math.cos(θ) * 114).toFixed(2));
+    line.setAttribute('y2', +(CENTRE + Math.sin(θ) * 114).toFixed(2));
+    line.setAttribute('class', 'kalam-spoke');
+    svg.appendChild(line);
+  }
+
+  /* Small diamond marks where each spoke crosses each ring — the "nail holes"
+     a kolam artist presses to anchor each flower position. Only on the outer
+     four rings so the centre stays legible. */
+  const SPOKE_ANGLES = Array.from({ length: 12 }, (_, k) => (k * 30 - 90) * Math.PI / 180);
+  for (let i = 7; i <= RING_COUNT; i++) {
+    const r = 12 + i * 10 + 5;
+    for (const θ of SPOKE_ANGLES) {
+      const x = CENTRE + Math.cos(θ) * r;
+      const y = CENTRE + Math.sin(θ) * r;
+      const dot = document.createElementNS(NS, 'circle');
+      dot.setAttribute('cx', x.toFixed(2));
+      dot.setAttribute('cy', y.toFixed(2));
+      dot.setAttribute('r', '1.5');
+      dot.setAttribute('class', 'kalam-guide-dot');
+      svg.appendChild(dot);
+    }
   }
 }
 
@@ -109,14 +145,32 @@ const Pookalam = {
     }
     this.rings = groups;
 
-    // centre seed — the "something is meant to go here" cue
-    const seed = document.createElementNS(NS, 'circle');
-    seed.setAttribute('cx', CENTRE);
-    seed.setAttribute('cy', CENTRE);
-    seed.setAttribute('r', 9);
-    seed.setAttribute('class', 'kalam-seed');
-    svg.appendChild(seed);
-    this.seed = seed;
+    /* Centre lotus — six tiny petals arranged like a flower, each a small
+       teardrop outline. This is what a proper kolam has at the origin:
+       a lotus bud, not a plain circle. The petals keep the .kalam-seed class
+       so .kalam-seed.lit turns them red when ring 0 blooms. */
+    const lotusGroup = document.createElementNS(NS, 'g');
+    lotusGroup.setAttribute('class', 'kalam-seed');
+    for (let p = 0; p < 6; p++) {
+      const angle = p * 60;
+      const pos = document.createElementNS(NS, 'g');
+      pos.setAttribute('transform',
+        `rotate(${angle} ${CENTRE} ${CENTRE}) translate(${CENTRE} ${CENTRE - 5})`);
+      const petal = document.createElementNS(NS, 'path');
+      petal.setAttribute('d', petalPath(8, 2.2));
+      petal.setAttribute('class', 'kalam-lotus-petal');
+      pos.appendChild(petal);
+      lotusGroup.appendChild(pos);
+    }
+    /* Small filled circle at the very centre anchors the lotus */
+    const centDot = document.createElementNS(NS, 'circle');
+    centDot.setAttribute('cx', CENTRE);
+    centDot.setAttribute('cy', CENTRE);
+    centDot.setAttribute('r', '3.5');
+    centDot.setAttribute('class', 'kalam-lotus-dot');
+    lotusGroup.appendChild(centDot);
+    svg.appendChild(lotusGroup);
+    this.seed = lotusGroup;
   },
 
   /* How full the pookalam is, 0 -> 1. CSS reads this to grow the artwork from
