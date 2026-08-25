@@ -1,0 +1,15 @@
+{
+  "functions": {
+    "targets": [
+      "quiz_api"
+    ],
+    "ignore": [],
+    "source": "functions"
+  },
+  "slate": [
+    {
+      "name": "onam-quiz",
+      "source": "/Users/sibhi-zstch1643/conductor/workspaces/onam-utsavam/cayenne/onam-quiz"
+    }
+  ]
+}

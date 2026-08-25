@@ -1,0 +1,30 @@
+{
+  "defaults": {
+    "project": 1,
+    "env": 1
+  },
+  "actives": {
+    "project": 1,
+    "env": 1
+  },
+  "projects": [
+    {
+      "idx": 1,
+      "id": "53069000000013054",
+      "name": "onam-utsavam",
+      "domain": {
+        "id": "50045092963",
+        "name": "onam-utsavam-60083782173.development"
+      },
+      "timezone": "Asia/Kolkata",
+      "env": [
+        {
+          "idx": 1,
+          "id": "60083782173",
+          "name": "Development",
+          "type": 3
+        }
+      ]
+    }
+  ]
+}
