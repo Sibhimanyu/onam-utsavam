@@ -422,6 +422,46 @@ body::after {
 }
 .btn.ghost:hover { background: #FCF1F0; }
 
+/* ---------- start screen: mode navigation ----------
+
+   Three ways to play — solo quiz, host a live round, or join one already
+   running. The divider and two-column ghost buttons keep the hierarchy clear:
+   the primary action (Start Quiz) dominates, the live modes are secondary. */
+
+.mode-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 16px 0 0;
+  color: var(--muted);
+  font-size: 11.5px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.mode-divider::before,
+.mode-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--hair);
+}
+
+.mode-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+/* Override btn defaults for the compact mode buttons */
+.mode-btn {
+  margin-top: 0;
+  font-size: 13px;
+  padding: 10px 10px;
+  letter-spacing: .02em;
+}
+
 /* ---------- result ---------- */
 
 /* Score bounces in with a springy entrance — the result feels like an event,

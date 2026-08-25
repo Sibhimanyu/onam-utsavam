@@ -146,11 +146,27 @@ function renderStart() {
     <h1 class="title">Onam Pookalam Quiz</h1>
     <p class="lede">Ten questions. Every answer lays another ring of flowers.
        Finish the quiz, finish the pookalam.</p>
-    ${best ? `<p class="best">Your best so far: ${best} / ${questions.length}</p>` : ''}
-    <button class="btn" id="startBtn">Start Quiz</button>`;
+    ${best ? `<p class="best">&#9733; Your best: ${best} / ${questions.length}</p>` : ''}
+    <button class="btn" id="startBtn">&#9654; Start Solo Quiz</button>
+    <div class="mode-divider"><span>or play together</span></div>
+    <div class="mode-row">
+      <button class="btn ghost mode-btn" id="hostBtn">
+        &#128247; Host a Live Quiz
+      </button>
+      <button class="btn ghost mode-btn" id="joinBtn">
+        &#127918; Join with Code
+      </button>
+    </div>`;
+
   document.getElementById('startBtn').addEventListener('click', () => {
     state.screen = 'question';
     render();
+  });
+  document.getElementById('hostBtn').addEventListener('click', () => {
+    location.hash = 'host';
+  });
+  document.getElementById('joinBtn').addEventListener('click', () => {
+    location.hash = 'join';
   });
 }
 
