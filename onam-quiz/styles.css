@@ -491,6 +491,58 @@ body::after {
   letter-spacing: .02em;
 }
 
+/* ---------- Onam petal confetti (perfect score) ----------
+
+   72 petals rain from the top when the player scores 10/10.
+   Three shapes — teardrop, reverse-teardrop, and circle — in the full
+   Kerala festival palette: marigold, saffron, gold, kasavu yellow,
+   festival red, deep green, and cream-white.
+
+   --drift is a unique horizontal wander per petal, set inline by JS.
+   The keyframes curve the path at each quarter so petals sway as they fall,
+   not drop in a straight line like bullets.
+
+   Removed entirely for prefers-reduced-motion (no display:none trick —
+   the whole wrapper is never appended when the media query matches). */
+
+.confetti-wrap {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 9998; /* just below the kasavu viewport frame at 9999 */
+}
+
+.confetti-petal {
+  position: absolute;
+  top: -18px;
+  opacity: 0;
+  animation: petal-fall linear forwards;
+}
+
+@keyframes petal-fall {
+  0%   {
+    transform: translateY(0)     translateX(0)                          rotate(  0deg) scale(1);
+    opacity: 1;
+  }
+  25%  {
+    transform: translateY(28vh)  translateX(calc(var(--drift) * 0.25))  rotate(140deg) scale(0.95);
+    opacity: 1;
+  }
+  55%  {
+    transform: translateY(55vh)  translateX(calc(var(--drift) * 0.65))  rotate(300deg) scale(1.05);
+    opacity: 0.9;
+  }
+  80%  {
+    transform: translateY(82vh)  translateX(calc(var(--drift) * 0.90))  rotate(440deg) scale(0.88);
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(110vh) translateX(var(--drift))               rotate(560deg) scale(0.7);
+    opacity: 0;
+  }
+}
+
 /* ---------- result ---------- */
 
 /* Share + Play Again sit side by side — sharing is always available but the

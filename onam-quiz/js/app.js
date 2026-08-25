@@ -215,9 +215,71 @@ function renderQuestion() {
   }
 }
 
+/* Onam petal rain — 72 flower shapes in Kerala festival colours falling
+   from the top of the viewport. Three CSS shapes (teardrop, reverse-teardrop,
+   circle) give it the mixed-petal look of a real pookalam scattered by wind.
+   Respects prefers-reduced-motion by skipping entirely. */
+function celebratePerfectScore() {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  /* Kerala festival palette */
+  const COLORS = [
+    '#F08C00', /* marigold       */
+    '#F5960A', /* saffron        */
+    '#C9A227', /* kasavu gold    */
+    '#EDD040', /* bright gold    */
+    '#A8201A', /* festival red   */
+    '#D94040', /* lighter red    */
+    '#1E5B3A', /* Kerala green   */
+    '#3DBF68', /* light green    */
+    '#FBF6EC', /* cream-white    */
+  ];
+
+  /* Three petal shapes as CSS border-radius strings */
+  const SHAPES = [
+    '50% 50% 50% 0',   /* teardrop pointing bottom-left  */
+    '50% 0 50% 50%',   /* teardrop pointing bottom-right */
+    '50%',             /* circle (rangoli dot)            */
+    '50% 50% 0 50%',   /* teardrop pointing top-right    */
+  ];
+
+  const wrap = document.createElement('div');
+  wrap.className = 'confetti-wrap';
+  document.body.appendChild(wrap);
+
+  for (let i = 0; i < 72; i++) {
+    const p = document.createElement('div');
+    p.className = 'confetti-petal';
+    const color = COLORS[Math.floor(Math.random() * COLORS.length)];
+    const w = 5 + Math.random() * 9;               /* 5-14 px wide  */
+    const h = w * (0.6 + Math.random() * 0.8);     /* vary aspect   */
+    const drift = (Math.random() - 0.5) * 220;     /* px left/right */
+    const delay = Math.random() * 2.8;             /* stagger start */
+    const dur   = 2.8 + Math.random() * 2.4;       /* fall speed    */
+    p.style.cssText = [
+      `left:${Math.random() * 100}%`,
+      `background:${color}`,
+      `width:${w.toFixed(1)}px`,
+      `height:${h.toFixed(1)}px`,
+      `border-radius:${SHAPES[Math.floor(Math.random() * SHAPES.length)]}`,
+      `--drift:${drift.toFixed(0)}px`,
+      `animation-delay:${delay.toFixed(2)}s`,
+      `animation-duration:${dur.toFixed(2)}s`,
+    ].join(';');
+    wrap.appendChild(p);
+  }
+
+  /* Remove the DOM nodes after the longest possible petal has landed */
+  setTimeout(() => wrap.remove(), 7000);
+}
+
 function renderResult() {
   const total = questions.length;
   const best = bestScore();
+  /* Fire the petal rain before rendering so the DOM update and the confetti
+     launch happen in the same frame — no visible delay between score reveal
+     and petals appearing. */
+  if (state.score === total) celebratePerfectScore();
   el.panel.innerHTML = `
     <div class="score">${state.score} / ${total}<small>YOUR POOKALAM IS COMPLETE</small></div>
     <p class="msg">${scoreMessage(state.score, total)}</p>
