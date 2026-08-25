@@ -143,24 +143,25 @@ body::after {
   .kalam { transition: none; }
 }
 
-/* Warm tan disc — distinct from the paper background so the guide rings
-   read as art laid ON a surface, not floating. */
-.kalam-earth { fill: #EDE0C4; }
+/* Warm terracotta tan — noticeably distinct from the white paper so the disc
+   reads as a courtyard floor, not a blank circle. */
+.kalam-earth { fill: #E4D3AD; }
 
-/* Guide rings are visible kolam chalk lines — intentional art, not a placeholder.
-   Stronger stroke and tighter dash rhythm so they read at a glance. */
+/* Guide rings are kolam chalk lines drawn before the petals arrive.
+   Solid strokes (no dash) at good opacity so they're clearly visible. */
 .kalam-guide {
   fill: none;
-  stroke: rgba(168, 110, 20, 0.35);
-  stroke-width: 1.2;
-  stroke-dasharray: 4 5;
+  stroke: rgba(140, 88, 12, 0.50);
+  stroke-width: 1.4;
+  stroke-dasharray: none;
 }
 
+/* Centre seed is a small filled dot — the anchor point of the pookalam. */
 .kalam-seed {
-  fill: rgba(201, 162, 39, 0.18);
-  stroke: rgba(168, 110, 20, 0.45);
-  stroke-width: 1.5;
-  stroke-dasharray: 3 3;
+  fill: rgba(180, 120, 20, 0.30);
+  stroke: rgba(140, 88, 12, 0.55);
+  stroke-width: 2;
+  stroke-dasharray: none;
   transition: fill .4s ease, stroke .4s ease;
 }
 
@@ -448,14 +449,15 @@ body::after {
 }
 
 .mode-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
   gap: 8px;
   margin-top: 8px;
 }
 
-/* Override btn defaults for the compact mode buttons */
+/* Override btn defaults so each mode button takes equal space side by side */
 .mode-btn {
+  flex: 1;
+  width: auto;      /* cancel btn's width:100% */
   margin-top: 0;
   font-size: 13px;
   padding: 10px 10px;
