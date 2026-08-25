@@ -54,9 +54,9 @@ function renderProgress() {
   const n = state.index + 1;
   const total = questions.length;
   const pct = Math.round((n / total) * 100);
-  /* Running score — show after at least one answered question so the label
-     doesn't read "0 correct" on the very first question before any answer. */
-  const scoreHint = state.index > 0 || state.screen === 'feedback'
+  /* Running score — only once the player has at least 1 correct answer so we
+     never show the deflating "✓ 0 correct" label. */
+  const scoreHint = state.score > 0
     ? `<span class="score-hint">&#10003; ${state.score} correct</span>`
     : '';
   el.progress.innerHTML = `
