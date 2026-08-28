@@ -69,8 +69,8 @@ function renderStart() {
     <p class="subtitle"><span class="subtitle-ml" lang="ml">ഓണാശംസകൾ</span> &middot; Onam 2025</p>
     <div class="maveli-wrap">
       <picture>
-        <source srcset="img/maveli-welcome.webp?v=20" type="image/webp">
-        <img class="maveli" src="img/maveli-welcome.png?v=20"
+        <source srcset="img/maveli-welcome.webp?v=21" type="image/webp">
+        <img class="maveli" src="img/maveli-welcome.png?v=21"
              width="413" height="620"
              alt="King Maveli welcoming you to the quiz">
       </picture>
@@ -138,8 +138,8 @@ function renderQuestion() {
       <div class="feedback-strip ${correct ? 'ok' : 'no'}">
         <div class="reaction ${correct ? 'ok' : 'no'}">
           <picture>
-            <source srcset="${reactionBase}.webp?v=20" type="image/webp">
-            <img src="${reactionBase}.png?v=20" width="420" height="420"
+            <source srcset="${reactionBase}.webp?v=21" type="image/webp">
+            <img src="${reactionBase}.png?v=21" width="420" height="420"
                  alt="${reactionAlt}">
           </picture>
         </div>

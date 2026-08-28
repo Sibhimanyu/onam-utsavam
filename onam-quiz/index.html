@@ -6,16 +6,26 @@
   <title>Onam Pookalam Quiz</title>
   <!-- ?v= is a manual cache key. Slate serves assets with max-age=31536000 (a
        year), and there is no build step to fingerprint filenames, so bump this
-       number on every deploy or returning devices keep the old app. -->
-  <link rel="stylesheet" href="styles.css?v=20">
+       number on every deploy or returning devices keep the old app.
+
+       BUMPING IT IS NOT JUST A FIND-AND-REPLACE. img/join-qr.svg has the URL
+       encoded into the image, ?v= and all, so a text-only bump leaves the QR
+       pointing at the previous version — and the QR is how most people join.
+       Regenerate it in the same commit, with the exact flags it was made with:
+
+         npx qrcode -t svg -o onam-quiz/img/join-qr.svg \
+           "https://onam-quiz-tegpgzpi.onslate.in/?v=<NEW>#join"
+
+       Then confirm the QR and the typed fallback in live.js still agree. -->
+  <link rel="stylesheet" href="styles.css?v=21">
 
   <!-- The two reaction images are needed within seconds of the quiz starting,
        but nothing references them until the first answer is scored, so without
        this the reaction slot sits empty while the file downloads. As WebP they
        are ~82KB for the pair, which is worth spending up front. type= gates
        the hint, so browsers without WebP skip it and fall back to the PNG. -->
-  <link rel="preload" as="image" type="image/webp" href="img/maveli-happy.webp?v=20">
-  <link rel="preload" as="image" type="image/webp" href="img/maveli-sigh.webp?v=20">
+  <link rel="preload" as="image" type="image/webp" href="img/maveli-happy.webp?v=21">
+  <link rel="preload" as="image" type="image/webp" href="img/maveli-sigh.webp?v=21">
 </head>
 <body>
   <main class="stage">
@@ -28,9 +38,9 @@
 
   <!-- Plain scripts, loaded in dependency order. No modules (so file:// works),
        no external libraries, no CDN. -->
-  <script src="js/questions.js?v=20"></script>
-  <script src="js/api.js?v=20"></script>
-  <script src="js/live.js?v=20"></script>
-  <script src="js/app.js?v=20"></script>
+  <script src="js/questions.js?v=21"></script>
+  <script src="js/api.js?v=21"></script>
+  <script src="js/live.js?v=21"></script>
+  <script src="js/app.js?v=21"></script>
 </body>
 </html>

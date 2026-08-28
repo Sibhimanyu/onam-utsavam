@@ -176,14 +176,14 @@ const Live = (() => {
       document.getElementById('hostBody').innerHTML = `
         <div class="joinbar">
           <div class="qrwrap">
-            <img src="img/join-qr.svg?v=20" alt="Scan to join the quiz" class="qr">
+            <img src="img/join-qr.svg?v=21" alt="Scan to join the quiz" class="qr">
           </div>
           <div class="joininfo">
             <p class="joinlabel">Scan to join</p>
             <!-- The ?v= must stay in the typed fallback too. Slate caches
                  index.html for a year and ignores _headers, so a bare URL can
                  serve a stale app to any phone that opened it before. -->
-            <p class="joinurl">onam-quiz-tegpgzpi.onslate.in/?v=20#join</p>
+            <p class="joinurl">onam-quiz-tegpgzpi.onslate.in/?v=21#join</p>
             <p class="joinlabel">or enter code</p>
             <p class="joincode">${this.code}</p>
           </div>
@@ -415,8 +415,8 @@ const Live = (() => {
           <div class="feedback-strip ${correct ? 'ok' : 'no'}">
             <div class="reaction ${correct ? 'ok' : 'no'}">
               <picture>
-                <source srcset="${reactionBase}.webp?v=20" type="image/webp">
-                <img src="${reactionBase}.png?v=20" width="420" height="420"
+                <source srcset="${reactionBase}.webp?v=21" type="image/webp">
+                <img src="${reactionBase}.png?v=21" width="420" height="420"
                      alt="${reactionAlt}">
               </picture>
             </div>
