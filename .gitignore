@@ -17,3 +17,7 @@ catalyst-debug.log
 .env
 .env.*
 !.env.example
+
+# `catalyst serve` injects this dev-only live-reload script into the Slate dir.
+# slate-config.toml in the same folder IS tracked, so ignore just this file.
+onam-quiz/.catalyst/reload-script.js
