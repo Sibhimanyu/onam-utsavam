@@ -4,20 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Onam Pookalam Quiz</title>
-  <!-- ?v= is a manual cache key. Slate serves assets with max-age=31536000 (a
-       year), and there is no build step to fingerprint filenames, so bump this
-       number on every deploy or returning devices keep the old app.
-
-       BUMPING IT IS NOT JUST A FIND-AND-REPLACE. img/join-qr.svg has the URL
-       encoded into the image, ?v= and all, so a text-only bump leaves the QR
-       pointing at the previous version — and the QR is how most people join.
-       Regenerate it in the same commit, with the exact flags it was made with:
-
-         npx qrcode -t svg -o onam-quiz/img/join-qr.svg \
-           "https://onam-quiz-tegpgzpi.onslate.in/?v=<NEW>#join"
-
-       Then confirm the QR and the typed fallback in live.js still agree. -->
-  <link rel="stylesheet" href="styles.css?v=21">
+  <!-- Keep asset versions aligned when deploying through an intermediary cache. -->
+  <link rel="stylesheet" href="styles.css?v=23">
 
   <!-- Warm the two reaction images. Nothing references them until the first
        answer is scored, so without a hint the reaction slot sits empty while
@@ -44,9 +32,13 @@
     <section id="panel" class="panel"></section>
   </main>
 
-  <!-- Plain scripts, loaded in dependency order. No modules (so file:// works),
-       no external libraries, no CDN. -->
+  <!-- The Firebase compat SDK keeps this no-build static site in classic script
+       mode. `firebase-config.js` contains the project-specific web config. -->
   <script src="js/questions.js?v=21"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-database-compat.js"></script>
+  <script src="js/firebase-config.js?v=1"></script>
   <script src="js/api.js?v=21"></script>
   <script src="js/live.js?v=21"></script>
   <script src="js/app.js?v=21"></script>

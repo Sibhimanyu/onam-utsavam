@@ -240,7 +240,9 @@ function renderResult() {
   document.getElementById('againBtn').addEventListener('click', restart);
   document.getElementById('shareBtn').addEventListener('click', () => {
     const mood = state.score === total ? 'Maveli is dancing!' : `Maveli gave me ${state.score} cheers.`;
-    const text = `I scored ${state.score}/${total} on the Onam Pookalam Quiz! ${mood}\nTry it: https://onam-quiz-tegpgzpi.onslate.in`;
+    const publicUrl = String(window.QUIZ_PUBLIC_URL || '').replace(/\/$/, '') ||
+      location.origin + location.pathname;
+    const text = `I scored ${state.score}/${total} on the Onam Pookalam Quiz! ${mood}\nTry it: ${publicUrl}`;
     const btn = document.getElementById('shareBtn');
     const LABEL = '&#x1F517; Share Score';
 
@@ -381,8 +383,7 @@ function restart() {
 /* ---------- routing ---------- */
 
 /* Hash routes, not real paths. A hash needs zero server configuration, so it
-   cannot 404 on static Slate hosting — which matters when the join URL is
-   printed inside a QR code and projected in front of a room.
+   works from one static Firebase Hosting entry point.
 
      (no hash)  the graded single-player quiz — untouched by live mode
      #host      host dashboard: QR, session code, live leaderboard

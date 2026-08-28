@@ -971,6 +971,9 @@ body::after {
     padding: 8px 10px;
   }
   .feedback-copy .btn { margin-top: 8px; }
+  /* Keep the four answer slots stable after a tap. Hiding the unselected
+     choices makes the correct answer appear to jump into an earlier position. */
+  .opts.answered .opt.dim { display: flex; }
   .mode-row { flex-direction: column; }
   .mode-btn { width: 100%; }
   .podium { grid-template-columns: 1fr; }
@@ -1024,32 +1027,50 @@ body::after {
    breakpoints. Fallback is graceful: a browser without :has() simply keeps the
    phone-sized layout instead of breaking. */
 @media (min-width: 900px) {
-  /* Fill the screen and centre vertically — no dead band under the content. */
+  /* Keep the host controls and leaderboard visible together on a projector. */
   body:has(.host) { place-items: center; padding: 24px; }
 
   .stage:has(.host) { max-width: min(1500px, 94vw); width: 100%; }
-  .stage:has(.host) .panel { padding: 10px clamp(24px, 3vw, 56px) clamp(24px, 3vw, 48px); }
-
-  .stage:has(.host) .host-title { font-size: clamp(30px, 3.2vw, 62px); margin-bottom: 14px; }
-
-  .stage:has(.host) .joinbar { gap: clamp(20px, 3vw, 56px); padding: clamp(16px, 2vw, 34px); }
-  .stage:has(.host) .qrwrap { padding: clamp(10px, 1vw, 18px); }
-  .stage:has(.host) .qr {
-    width: clamp(220px, 26vmin, 400px);
-    height: clamp(220px, 26vmin, 400px);
+  .stage:has(.host) .panel { padding: 10px clamp(20px, 2.4vw, 44px) clamp(16px, 2vw, 32px); }
+  .stage:has(.host) #hostBody:has(.joinbar) {
+    display: grid;
+    grid-template-columns: minmax(250px, .72fr) minmax(0, 1.28fr);
+    grid-template-areas:
+      "join board"
+      "close close";
+    align-items: start;
+    column-gap: clamp(18px, 2.5vw, 42px);
+    row-gap: 10px;
   }
 
-  .stage:has(.host) .joinlabel { font-size: clamp(12px, 1.15vw, 22px); margin-bottom: 6px; }
-  .stage:has(.host) .joinurl   { font-size: clamp(14px, 1.25vw, 26px); margin-bottom: 18px; }
-  /* The single most important thing on the screen. */
-  .stage:has(.host) .joincode  { font-size: clamp(64px, 8.5vw, 168px); }
+  .stage:has(.host) .host > .host-title { font-size: clamp(28px, 2.5vw, 46px); margin: 4px 0 10px; }
 
-  .stage:has(.host) .lb h4     { font-size: clamp(12px, 1.15vw, 22px); }
-  .stage:has(.host) .row       { font-size: clamp(18px, 1.8vw, 36px); padding: clamp(8px, 0.7vw, 16px) 0; }
-  .stage:has(.host) .rk        { width: clamp(20px, 2vw, 40px); }
-  .stage:has(.host) .prog-dots { font-size: clamp(12px, 1vw, 20px); }
-  .stage:has(.host) .lb-note   { font-size: clamp(15px, 1.4vw, 28px); }
-  .stage:has(.host) .btn       { font-size: clamp(16px, 1.3vw, 26px); padding: clamp(12px, 1.1vw, 20px); }
+  .stage:has(.host) .joinbar {
+    grid-area: join;
+    flex-direction: column;
+    gap: 10px;
+    padding: clamp(12px, 1.25vw, 18px);
+    text-align: center;
+  }
+  .stage:has(.host) .qrwrap { padding: 8px; }
+  .stage:has(.host) .qr {
+    width: clamp(132px, 15vmin, 180px);
+    height: clamp(132px, 15vmin, 180px);
+  }
+
+  .stage:has(.host) .joinlabel { font-size: clamp(11px, .85vw, 15px); margin-bottom: 4px; }
+  .stage:has(.host) .joinurl   { font-size: clamp(12px, .9vw, 16px); margin-bottom: 10px; }
+  .stage:has(.host) .joincode  { font-size: clamp(48px, 4.5vw, 82px); }
+
+  .stage:has(.host) .lb-live { grid-area: board; min-width: 0; margin: 0; }
+  .stage:has(.host) .lb h4     { font-size: clamp(12px, .95vw, 17px); margin-bottom: 6px; }
+  .stage:has(.host) #hostBoard { max-height: min(54vh, 500px); overflow-y: auto; padding-right: 8px; }
+  .stage:has(.host) .row       { font-size: clamp(16px, 1.3vw, 24px); padding: clamp(5px, .45vw, 8px) 0; }
+  .stage:has(.host) .rk        { width: clamp(18px, 1.5vw, 28px); }
+  .stage:has(.host) .prog-dots { font-size: clamp(11px, .8vw, 15px); }
+  .stage:has(.host) .lb-note   { font-size: clamp(14px, 1vw, 18px); }
+  .stage:has(.host) #closeBtn  { grid-area: close; margin-top: 0; }
+  .stage:has(.host) .btn       { font-size: clamp(15px, 1vw, 20px); padding: clamp(10px, .8vw, 14px); }
 
   /* Bigger, so "this board is live" reads from the back of the room. */
   .stage:has(.host) .pulse { width: clamp(9px, 0.9vw, 18px); height: clamp(9px, 0.9vw, 18px); }
