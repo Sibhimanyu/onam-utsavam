@@ -69,6 +69,7 @@ const Live = (() => {
           <span class="winner-kicker">Quiz champion</span>
           <h1 class="host-title">${escapeHtml(top.player_name || 'Anonymous')}</h1>
           <div class="score">${top.score} / ${top.total}<small>FINAL SCORE</small></div>
+          ${o.host ? '<img src="img/maveli-happy.webp?v=21" class="champion-maveli" alt="Maveli celebrating the quiz champion">' : ''}
         </div>
         <div class="podium">${podium}</div>
         <div class="lb final-board">${boardHtml(rows, {
