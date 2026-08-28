@@ -317,8 +317,14 @@ const Live = (() => {
       const body = document.getElementById('joinBody');
 
       if (!res) {
+        /* Joiners arrive by scanning a QR, so they are on a phone on venue
+           wifi — exactly where this branch fires, and where "reload" means
+           hunting for browser chrome. Give them the same in-page retry the
+           no-quiz-running branch below already has. */
         body.innerHTML = `<p class="lede">Could not reach the quiz. Check your connection
-          and reload.</p>`;
+          and try again.</p>
+          <button class="btn" id="retryBtn">Try again</button>`;
+        document.getElementById('retryBtn').addEventListener('click', () => this.mount(root));
         return;
       }
       if (!res.code) {
