@@ -1027,96 +1027,123 @@ body::after {
    breakpoints. Fallback is graceful: a browser without :has() simply keeps the
    phone-sized layout instead of breaking. */
 @media (min-width: 900px) {
-  /* Keep the host controls and leaderboard visible together on a projector. */
   body:has(.host) { place-items: center; padding: 24px; }
 
   .stage:has(.host) { max-width: min(1500px, 94vw); width: 100%; }
-  .stage:has(.host) .panel { padding: 10px clamp(20px, 2.4vw, 44px) clamp(16px, 2vw, 32px); }
-  .stage:has(.host) #hostBody:has(.joinbar) {
-    display: grid;
-    grid-template-columns: minmax(250px, .72fr) minmax(0, 1.28fr);
-    grid-template-areas:
-      "join board"
-      "close close";
-    align-items: start;
-    column-gap: clamp(18px, 2.5vw, 42px);
-    row-gap: 10px;
-  }
+  .stage:has(.host) .panel { padding: 10px clamp(24px, 3vw, 56px) clamp(24px, 3vw, 48px); }
 
-  .stage:has(.host) .host > .host-title { font-size: clamp(28px, 2.5vw, 46px); margin: 4px 0 10px; }
+  .stage:has(.host) .host-title { font-size: clamp(30px, 3.2vw, 62px); margin-bottom: 14px; }
 
-  .stage:has(.host) .joinbar {
-    grid-area: join;
-    flex-direction: column;
-    gap: 10px;
-    padding: clamp(12px, 1.25vw, 18px);
-    text-align: center;
-  }
-  .stage:has(.host) .qrwrap { padding: 8px; }
+  .stage:has(.host) .joinbar { gap: clamp(20px, 3vw, 56px); padding: clamp(16px, 2vw, 34px); }
+  .stage:has(.host) .qrwrap { padding: clamp(10px, 1vw, 18px); }
   .stage:has(.host) .qr {
-    width: clamp(132px, 15vmin, 180px);
-    height: clamp(132px, 15vmin, 180px);
+    width: clamp(220px, 26vmin, 400px);
+    height: clamp(220px, 26vmin, 400px);
   }
 
-  .stage:has(.host) .joinlabel { font-size: clamp(11px, .85vw, 15px); margin-bottom: 4px; }
-  .stage:has(.host) .joinurl   { font-size: clamp(12px, .9vw, 16px); margin-bottom: 10px; }
-  .stage:has(.host) .joincode  { font-size: clamp(48px, 4.5vw, 82px); }
+  .stage:has(.host) .joinlabel { font-size: clamp(12px, 1.15vw, 22px); margin-bottom: 6px; }
+  .stage:has(.host) .joinurl   { font-size: clamp(14px, 1.25vw, 26px); margin-bottom: 18px; }
+  .stage:has(.host) .joincode  { font-size: clamp(64px, 8.5vw, 168px); }
 
-  .stage:has(.host) .lb-live { grid-area: board; min-width: 0; margin: 0; }
-  .stage:has(.host) .lb h4     { font-size: clamp(12px, .95vw, 17px); margin-bottom: 6px; }
-  .stage:has(.host) #hostBoard { max-height: min(54vh, 500px); overflow-y: auto; padding-right: 8px; }
-  .stage:has(.host) .row       { font-size: clamp(16px, 1.3vw, 24px); padding: clamp(5px, .45vw, 8px) 0; }
-  .stage:has(.host) .rk        { width: clamp(18px, 1.5vw, 28px); }
-  .stage:has(.host) .prog-dots { font-size: clamp(11px, .8vw, 15px); }
-  .stage:has(.host) .lb-note   { font-size: clamp(14px, 1vw, 18px); }
-  .stage:has(.host) #closeBtn  { grid-area: close; margin-top: 0; }
-  .stage:has(.host) .btn       { font-size: clamp(15px, 1vw, 20px); padding: clamp(10px, .8vw, 14px); }
+  .stage:has(.host) .lb h4     { font-size: clamp(12px, 1.15vw, 22px); }
+  .stage:has(.host) .row       { font-size: clamp(18px, 1.8vw, 36px); padding: clamp(8px, .7vw, 16px) 0; }
+  .stage:has(.host) .rk        { width: clamp(20px, 2vw, 40px); }
+  .stage:has(.host) .prog-dots { font-size: clamp(12px, 1vw, 20px); }
+  .stage:has(.host) .lb-note   { font-size: clamp(15px, 1.4vw, 28px); }
+  .stage:has(.host) .btn       { font-size: clamp(16px, 1.3vw, 26px); padding: clamp(12px, 1.1vw, 20px); }
 
   /* Bigger, so "this board is live" reads from the back of the room. */
   .stage:has(.host) .pulse { width: clamp(9px, 0.9vw, 18px); height: clamp(9px, 0.9vw, 18px); }
 
+  /* Final standings are read as a board, not a victory poster. Keep the
+     champion prominent at left and reserve the projector height for scores. */
+  .stage:has(.host) .host-reveal {
+    display: grid;
+    grid-template-columns: minmax(260px, .72fr) minmax(0, 1.28fr);
+    grid-template-areas:
+      "meta board"
+      "winner board"
+      "podium board";
+    align-items: start;
+    column-gap: clamp(20px, 2.6vw, 44px);
+    row-gap: 8px;
+    text-align: left;
+  }
+
+  .stage:has(.host) .host-reveal > .joinlabel {
+    grid-area: meta;
+    margin: 0;
+  }
+
   .stage:has(.host) .host-reveal .winner-burst {
-    padding: clamp(22px, 2.5vw, 48px);
-    margin-top: clamp(10px, 1vw, 20px);
+    grid-area: winner;
+    padding: clamp(14px, 1.35vw, 24px);
+    margin: 0;
   }
 
   .stage:has(.host) .host-reveal .winner-kicker {
-    font-size: clamp(14px, 1.3vw, 26px);
+    font-size: clamp(11px, .9vw, 16px);
   }
 
   .stage:has(.host) .host-reveal .host-title {
-    font-size: clamp(46px, 6vw, 112px);
-    margin: 8px 0;
+    font-size: clamp(38px, 4vw, 68px);
+    margin: 4px 0;
   }
 
   .stage:has(.host) .host-reveal .score {
-    font-size: clamp(54px, 7vw, 128px);
+    font-size: clamp(42px, 4.5vw, 72px);
+    margin-top: 6px;
   }
 
-  .stage:has(.host) .podium {
-    gap: clamp(12px, 1.5vw, 28px);
-    margin-top: clamp(16px, 1.8vw, 34px);
+  .stage:has(.host) .host-reveal .podium {
+    grid-area: podium;
+    grid-template-columns: 1fr;
+    gap: 6px;
+    margin: 0;
   }
 
-  .stage:has(.host) .podium-card {
-    padding: clamp(14px, 1.4vw, 28px);
+  .stage:has(.host) .host-reveal .podium-card {
+    display: grid;
+    grid-template-columns: 32px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    text-align: left;
   }
 
-  .stage:has(.host) .podium-rank {
-    width: clamp(36px, 3.2vw, 68px);
-    height: clamp(36px, 3.2vw, 68px);
-    font-size: clamp(18px, 1.8vw, 34px);
+  .stage:has(.host) .host-reveal .podium-rank {
+    width: 28px;
+    height: 28px;
+    margin: 0;
+    font-size: 14px;
   }
 
-  .stage:has(.host) .podium-card strong {
-    font-size: clamp(18px, 1.7vw, 34px);
+  .stage:has(.host) .host-reveal .podium-card strong {
+    font-size: clamp(14px, 1.2vw, 18px);
   }
 
-  .stage:has(.host) .podium-card span:last-child {
-    font-size: clamp(18px, 1.7vw, 34px);
+  .stage:has(.host) .host-reveal .podium-card span:last-child {
+    margin: 0;
+    font-size: clamp(14px, 1.1vw, 18px);
   }
 
-  .stage:has(.host) .final-board {
-    max-height: 28vh;
+  .stage:has(.host) .host-reveal .final-board {
+    grid-area: board;
+    align-self: stretch;
+    max-height: min(56vh, 420px);
+    margin: 0;
+    padding-top: 0;
+  }
+
+  .stage:has(.host) .host-reveal .final-board .row {
+    font-size: clamp(16px, 1.3vw, 22px);
+    padding: clamp(5px, .42vw, 8px) 0;
+  }
+
+  .stage:has(.host) .host-reveal .final-board .rk { width: clamp(18px, 1.5vw, 26px); }
+  .stage:has(.host) .host-reveal .final-board .prog-dots { font-size: clamp(10px, .75vw, 13px); }
+
+  .stage:has(.host) #hostBody:has(.host-reveal) > .btn {
+    margin-top: 10px;
   }
 }
