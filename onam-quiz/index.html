@@ -8,6 +8,14 @@
        year), and there is no build step to fingerprint filenames, so bump this
        number on every deploy or returning devices keep the old app. -->
   <link rel="stylesheet" href="styles.css?v=20">
+
+  <!-- The two reaction images are needed within seconds of the quiz starting,
+       but nothing references them until the first answer is scored, so without
+       this the reaction slot sits empty while the file downloads. As WebP they
+       are ~82KB for the pair, which is worth spending up front. type= gates
+       the hint, so browsers without WebP skip it and fall back to the PNG. -->
+  <link rel="preload" as="image" type="image/webp" href="img/maveli-happy.webp?v=20">
+  <link rel="preload" as="image" type="image/webp" href="img/maveli-sigh.webp?v=20">
 </head>
 <body>
   <main class="stage">

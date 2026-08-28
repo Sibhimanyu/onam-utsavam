@@ -68,8 +68,12 @@ function renderStart() {
   el.panel.innerHTML = `
     <p class="subtitle"><span class="subtitle-ml" lang="ml">ഓണാശംസകൾ</span> &middot; Onam 2025</p>
     <div class="maveli-wrap">
-      <img class="maveli" src="img/maveli-welcome.png?v=20"
-           alt="King Maveli welcoming you to the quiz">
+      <picture>
+        <source srcset="img/maveli-welcome.webp?v=20" type="image/webp">
+        <img class="maveli" src="img/maveli-welcome.png?v=20"
+             width="413" height="620"
+             alt="King Maveli welcoming you to the quiz">
+      </picture>
     </div>
     <h1 class="title">Onam Pookalam Quiz</h1>
     <p class="lede">Ten questions. Maveli cheers every right answer and sighs
@@ -118,7 +122,10 @@ function renderQuestion() {
   }).join('');
 
   const last = state.index === questions.length - 1;
-  const reactionSrc = correct ? 'img/maveli-happy.png?v=20' : 'img/maveli-sigh.png?v=20';
+  /* Base name, not a full src: the markup below serves WebP to anything that
+     takes it (~87% smaller) and keeps the PNG as the fallback, because a bare
+     WebP <img> shows a broken image on older Safari rather than degrading. */
+  const reactionBase = correct ? 'img/maveli-happy' : 'img/maveli-sigh';
   const reactionAlt = correct
     ? 'King Maveli celebrating a correct answer'
     : 'King Maveli giving a sympathetic sigh for a wrong answer';
@@ -130,7 +137,11 @@ function renderQuestion() {
     ${answered ? `
       <div class="feedback-strip ${correct ? 'ok' : 'no'}">
         <div class="reaction ${correct ? 'ok' : 'no'}">
-          <img src="${reactionSrc}" alt="${reactionAlt}">
+          <picture>
+            <source srcset="${reactionBase}.webp?v=20" type="image/webp">
+            <img src="${reactionBase}.png?v=20" width="420" height="420"
+                 alt="${reactionAlt}">
+          </picture>
         </div>
         <div class="feedback-copy">
           <p class="fb ${correct ? 'ok' : 'no'}">

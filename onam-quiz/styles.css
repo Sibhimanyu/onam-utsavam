@@ -368,11 +368,23 @@ body::after {
   isolation: isolate;
 }
 
+/* <picture> is display:inline by default, so it would shrink-wrap and leave
+   the img's width:100% resolving against a collapsed box. */
+.reaction picture,
+.maveli-wrap picture {
+  display: block;
+}
+
 .reaction img {
   position: relative;
   z-index: 1;
   display: block;
   width: 100%;
+  /* The width/height attributes on the img are there to reserve layout space
+     before decode, but height maps to a CSS height hint that outranks
+     aspect-ratio, which rendered the reaction 112x420. Keep height auto so
+     aspect-ratio stays in charge. */
+  height: auto;
   aspect-ratio: 1;
   object-fit: contain;
   filter: drop-shadow(0 12px 24px rgba(42, 33, 24, 0.16));

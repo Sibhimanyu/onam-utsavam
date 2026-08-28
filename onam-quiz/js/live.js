@@ -381,7 +381,8 @@ const Live = (() => {
       const q = questions[this.index];
       const correct = answered && picked === q.answer;
       const last = this.index === questions.length - 1;
-      const reactionSrc = correct ? 'img/maveli-happy.png?v=20' : 'img/maveli-sigh.png?v=20';
+      /* Base name, not a full src — see the matching note in app.js. */
+      const reactionBase = correct ? 'img/maveli-happy' : 'img/maveli-sigh';
       const reactionAlt = correct
         ? 'King Maveli celebrating a correct answer'
         : 'King Maveli giving a sympathetic sigh for a wrong answer';
@@ -413,7 +414,11 @@ const Live = (() => {
         ${answered ? `
           <div class="feedback-strip ${correct ? 'ok' : 'no'}">
             <div class="reaction ${correct ? 'ok' : 'no'}">
-              <img src="${reactionSrc}" alt="${reactionAlt}">
+              <picture>
+                <source srcset="${reactionBase}.webp?v=20" type="image/webp">
+                <img src="${reactionBase}.png?v=20" width="420" height="420"
+                     alt="${reactionAlt}">
+              </picture>
             </div>
             <div class="feedback-copy">
               <p class="fb ${correct ? 'ok' : 'no'}">
