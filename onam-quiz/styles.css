@@ -176,6 +176,15 @@ body::after {
   margin: 16px 0 4px;
 }
 
+/* Malayalam is a Brahmic script: vowel signs and chillu combine into single
+   grapheme clusters. The tracking above is right for the Latin half but pulls
+   ഓണാശംസകൾ apart into six loose pieces, so opt the Malayalam span out of both
+   tracking and casing (uppercase is a no-op here, but say so explicitly). */
+.subtitle-ml {
+  letter-spacing: normal;
+  text-transform: none;
+}
+
 .maveli-wrap {
   display: flex;
   justify-content: center;

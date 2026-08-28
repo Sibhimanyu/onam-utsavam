@@ -66,7 +66,7 @@ function renderProgress() {
 function renderStart() {
   const best = bestScore();
   el.panel.innerHTML = `
-    <p class="subtitle">ഓണാശംസകൾ &middot; Onam 2025</p>
+    <p class="subtitle"><span class="subtitle-ml" lang="ml">ഓണാശംസകൾ</span> &middot; Onam 2025</p>
     <div class="maveli-wrap">
       <img class="maveli" src="img/maveli-welcome.png?v=20"
            alt="King Maveli welcoming you to the quiz">
