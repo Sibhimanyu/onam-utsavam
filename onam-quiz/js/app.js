@@ -231,14 +231,33 @@ function renderResult() {
     const mood = state.score === total ? 'Maveli is dancing!' : `Maveli gave me ${state.score} cheers.`;
     const text = `I scored ${state.score}/${total} on the Onam Pookalam Quiz! ${mood}\nTry it: https://onam-quiz-tegpgzpi.onslate.in`;
     const btn = document.getElementById('shareBtn');
+    const LABEL = '&#x1F517; Share Score';
+
+    /* Every outcome flashes and then restores the label. Clipboard writes
+       reject routinely — permission denied, or the document simply not focused
+       because the user switched tabs — and the old catch replaced the label
+       permanently, so one failed copy left the button reading "Score: 7/10"
+       for the rest of the session with no hint it was still a share button. */
+    const flash = html => {
+      if (!btn) return;
+      btn.innerHTML = html;
+      setTimeout(() => { if (btn) btn.innerHTML = LABEL; }, 2000);
+    };
+
+    const copy = () => navigator.clipboard.writeText(text)
+      .then(() => flash('&#10003; Copied!'))
+      .catch(() => flash('&#9888; Could not copy'));
+
     if (navigator.share) {
-      navigator.share({ text }).catch(() => {});
-    } else {
-      navigator.clipboard.writeText(text).then(() => {
-        if (btn) { btn.innerHTML = '&#10003; Copied!'; setTimeout(() => { if (btn) btn.innerHTML = '&#x1F517; Share Score'; }, 2000); }
-      }).catch(() => {
-        if (btn) btn.innerHTML = '&#10003; Score: ' + state.score + '/' + total;
+      navigator.share({ text }).catch(err => {
+        /* AbortError is the user dismissing the share sheet, which is not a
+           failure and needs no feedback. Anything else means the sheet is
+           unusable, so fall through to the clipboard rather than the old
+           silent no-op that left the click looking broken. */
+        if (err && err.name !== 'AbortError') copy();
       });
+    } else {
+      copy();
     }
   });
   renderLeaderboardSlot();
