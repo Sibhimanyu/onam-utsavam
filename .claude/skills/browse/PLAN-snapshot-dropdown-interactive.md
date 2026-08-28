@@ -1,1 +1,0 @@
-/Users/sibhi-zstch1643/conductor/repos/onam-utsavam/.claude/skills/gstack/browse/PLAN-snapshot-dropdown-interactive.md

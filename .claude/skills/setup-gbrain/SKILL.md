@@ -1,1 +1,0 @@
-/Users/sibhi-zstch1643/conductor/repos/onam-utsavam/.claude/skills/gstack/setup-gbrain/SKILL.md

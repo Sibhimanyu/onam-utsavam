@@ -3,3 +3,17 @@ node_modules/
 
 # OS noise
 .DS_Store
+
+# Agent tooling — vendored gstack skills, symlinked to an absolute local path.
+# Not portable, and it leaks the machine's home directory.
+.claude/
+.gstack/
+
+# Catalyst CLI local state — project/env IDs, machine-specific
+.catalystrc
+catalyst-debug.log
+
+# Secrets
+.env
+.env.*
+!.env.example
