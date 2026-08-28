@@ -32,8 +32,7 @@ body {
   padding: 24px 16px;
   font-family: var(--sans);
   color: var(--ink);
-  /* Festival floor — warm Onam radials in each corner, like petals scattering.
-     The concentric rings echo the pookalam itself. */
+  /* Festival floor — warm Onam radials in each corner, like petals scattering. */
   background:
     radial-gradient(ellipse 90% 60% at 5%  90%,  rgba(240,140,  0,.18) 0%, transparent 55%),
     radial-gradient(ellipse 80% 50% at 95% 10%,  rgba(201,162, 39,.15) 0%, transparent 55%),
@@ -71,7 +70,7 @@ body::after {
 
 .stage {
   width: 100%;
-  max-width: 460px;
+  max-width: 540px;
   background: var(--paper);
   border: 1.5px solid rgba(201, 162, 39, 0.55);
   border-radius: 16px;
@@ -136,96 +135,7 @@ body::after {
   opacity: 0.85;
 }
 
-/* ---------- pookalam ---------- */
-
-.kalam {
-  display: block;
-  margin: 16px auto 4px;
-  /* --kalam-fill runs 0→1 as rings bloom. Size grows so the pookalam earns
-     its space. Opacity no longer fades at rest — the guide rings are intentional
-     kolam art, not a loading placeholder. */
-  --kalam-fill: 0;
-  width: calc(190px + 50px * var(--kalam-fill));
-  height: calc(190px + 50px * var(--kalam-fill));
-  transition: width .5s ease, height .5s ease;
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .kalam { transition: none; }
-}
-
-/* Warm terracotta tan — noticeably distinct from the white paper so the disc
-   reads as a courtyard floor, not a blank circle. */
-.kalam-earth { fill: #E4D3AD; }
-
-/* Concentric ring boundaries — medium-weight chalk lines */
-.kalam-guide {
-  fill: none;
-  stroke: rgba(140, 88, 12, 0.45);
-  stroke-width: 1.3;
-}
-
-/* Radial spokes — lighter so they read as subdivision lines, not outlines */
-.kalam-spoke {
-  stroke: rgba(140, 88, 12, 0.28);
-  stroke-width: 0.9;
-}
-
-/* Small dot marks at spoke × ring intersections on the outer rings */
-.kalam-guide-dot {
-  fill: rgba(140, 88, 12, 0.40);
-  stroke: none;
-}
-
-/* Centre lotus petals — outline only before any bloom */
-.kalam-lotus-petal {
-  fill: rgba(180, 120, 20, 0.12);
-  stroke: rgba(140, 88, 12, 0.50);
-  stroke-width: 0.8;
-  transition: fill .4s ease, stroke .4s ease;
-}
-
-.kalam-lotus-dot {
-  fill: rgba(180, 120, 20, 0.40);
-  stroke: rgba(140, 88, 12, 0.55);
-  stroke-width: 1;
-  transition: fill .4s ease;
-}
-
-/* When ring 0 blooms, the whole lotus group gets .lit — turn it red */
-.kalam-seed.lit .kalam-lotus-petal {
-  fill: var(--red);
-  stroke: var(--red);
-}
-.kalam-seed.lit .kalam-lotus-dot {
-  fill: var(--red);
-  stroke: none;
-}
-
-/* No `fill` declared here on purpose. A stylesheet `fill` would override the
-   inline fill that pookalam.js sets when a ring blooms. Un-bloomed petals are
-   hidden by opacity instead. */
-.petal {
-  transform-box: fill-box;
-  transform-origin: 50% 100%;
-}
-
-/* Petals start collapsed; the ring class flips them open with a staggered pop. */
-.ring .petal { opacity: 0; }
-
-.ring.bloomed .petal {
-  animation: bloom .42s cubic-bezier(.34, 1.56, .64, 1) both;
-  animation-delay: calc(var(--i) * 9ms);
-}
-
-@keyframes bloom {
-  from { opacity: 0; transform: scale(.2); }
-  to   { opacity: 1; transform: scale(1); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .ring.bloomed .petal { animation: fade .3s ease both; animation-delay: 0s; }
-  @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
   .bar > i { transition: none; }
   /* The bloom, bar and pulse were covered but hover lift was not — every
      .opt and .btn still ran a translateY under reduce. Cover the movement
@@ -266,33 +176,18 @@ body::after {
   margin: 16px 0 4px;
 }
 
-/* ---------- Maveli character ----------
-
-   King Maveli descends from Vaikuntha every Onam to visit Kerala. He floats
-   gently — his umbrella raised, crown gleaming, garland swaying — on the start
-   screen. The gentle float animation respects prefers-reduced-motion. */
-
 .maveli-wrap {
   display: flex;
   justify-content: center;
-  margin: 2px 0 0;
+  margin: 0 auto 10px;
+  overflow: visible;
 }
 
 .maveli {
-  width: 80px;
-  height: 128px;
-  filter: drop-shadow(0 6px 16px rgba(201, 162, 39, 0.30));
-  animation: maveli-float 4.5s ease-in-out infinite;
-}
-
-@keyframes maveli-float {
-  0%, 100% { transform: translateY(0)   rotate(-.8deg); }
-  30%       { transform: translateY(-6px) rotate( .5deg); }
-  60%       { transform: translateY(-4px) rotate(-.4deg); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .maveli { animation: none; }
+  width: min(132px, 34vw);
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 8px 18px rgba(201, 162, 39, 0.22));
 }
 
 .title {
@@ -358,6 +253,10 @@ body::after {
 
 .opts { display: grid; gap: 8px; }
 
+.opts.answered {
+  gap: 6px;
+}
+
 .opt {
   display: flex;
   align-items: center;
@@ -412,14 +311,133 @@ body::after {
 .opt.bad  { border-color: var(--red); background: #FCF1F0; }
 .opt.bad .k { background: var(--red); border-color: var(--red); color: #fff; }
 .opt.dim  { opacity: .5; }
+.opts.answered .opt.dim { display: none; }
 
 .fb {
   font-size: 13px;
   font-weight: 600;
-  margin: 12px 0 0;
+  margin: 0;
+  line-height: 1.35;
 }
 .fb.ok { color: var(--green); }
 .fb.no { color: var(--red); }
+
+.feedback-strip {
+  display: grid;
+  grid-template-columns: minmax(84px, 112px) 1fr;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+  padding: 10px 12px;
+  border: 1px solid rgba(201, 162, 39, 0.22);
+  border-radius: 12px;
+  background:
+    radial-gradient(circle at 20% 15%, rgba(237, 208, 64, 0.24), transparent 34%),
+    #FFFBF0;
+  box-shadow: 0 8px 18px rgba(42, 33, 24, 0.07);
+}
+
+.feedback-strip.no {
+  background:
+    radial-gradient(circle at 20% 15%, rgba(168, 32, 26, 0.09), transparent 34%),
+    #FFF8F0;
+}
+
+.feedback-copy {
+  min-width: 0;
+}
+
+.feedback-copy .btn {
+  margin-top: 9px;
+}
+
+.reaction {
+  position: relative;
+  width: 100%;
+  margin: 0;
+  overflow: visible;
+  isolation: isolate;
+}
+
+.reaction img {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: contain;
+  filter: drop-shadow(0 12px 24px rgba(42, 33, 24, 0.16));
+}
+
+.reaction::before,
+.reaction::after {
+  content: '';
+  position: absolute;
+  inset: 12%;
+  border-radius: 999px;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.reaction.ok::before {
+  background:
+    radial-gradient(circle at 18% 24%, #F08C00 0 5px, transparent 6px),
+    radial-gradient(circle at 78% 26%, #EDD040 0 6px, transparent 7px),
+    radial-gradient(circle at 70% 76%, #3DBF68 0 5px, transparent 6px),
+    radial-gradient(circle at 26% 72%, #D94040 0 5px, transparent 6px),
+    radial-gradient(circle, rgba(237, 208, 64, 0.24), transparent 62%);
+  animation: cheer-sparkles .8s ease-out both;
+}
+
+.reaction.ok img {
+  animation: maveli-cheer .78s cubic-bezier(.2, 1.45, .42, 1) both;
+}
+
+.reaction.no::before {
+  background:
+    radial-gradient(ellipse at 50% 78%, rgba(111, 104, 93, 0.18), transparent 54%),
+    radial-gradient(circle at 78% 22%, rgba(168, 32, 26, 0.13), transparent 16%),
+    radial-gradient(circle at 86% 15%, rgba(111, 104, 93, 0.12), transparent 10%);
+  animation: sigh-cloud .9s ease-out both;
+}
+
+.reaction.no img {
+  animation: maveli-sigh .72s cubic-bezier(.36, .07, .19, .97) both;
+}
+
+@keyframes maveli-cheer {
+  0% { opacity: 0; transform: translateY(12px) scale(.86) rotate(-2deg); }
+  42% { opacity: 1; transform: translateY(-8px) scale(1.08) rotate(2deg); }
+  70% { transform: translateY(2px) scale(.98) rotate(-1deg); }
+  100% { opacity: 1; transform: none; }
+}
+
+@keyframes cheer-sparkles {
+  0% { opacity: 0; transform: scale(.55) rotate(-18deg); }
+  45% { opacity: 1; transform: scale(1.08) rotate(8deg); }
+  100% { opacity: 0; transform: scale(1.32) rotate(20deg); }
+}
+
+@keyframes maveli-sigh {
+  0% { opacity: 0; transform: translateY(8px) scale(.94); }
+  28% { opacity: 1; transform: translateX(-7px) rotate(-2deg); }
+  48% { transform: translateX(7px) rotate(2deg); }
+  68% { transform: translateX(-3px) rotate(-1deg); }
+  100% { opacity: 1; transform: none; }
+}
+
+@keyframes sigh-cloud {
+  0% { opacity: 0; transform: translateY(12px) scale(.82); }
+  40% { opacity: .9; }
+  100% { opacity: 0; transform: translateY(-16px) scale(1.2); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reaction.ok img,
+  .reaction.no img,
+  .reaction.ok::before,
+  .reaction.no::before { animation: none; }
+}
 
 /* ---------- focus ----------
 
@@ -689,6 +707,114 @@ body::after {
   border-bottom-color: rgba(201, 162, 39, 0.20);
 }
 
+.final-reveal {
+  text-align: center;
+  animation: panel-arrive .28s cubic-bezier(.25, .46, .45, .94) both;
+}
+
+.winner-burst {
+  position: relative;
+  padding: 16px 14px 14px;
+  margin-top: 8px;
+  border: 1px solid rgba(201, 162, 39, 0.34);
+  border-radius: 12px;
+  background:
+    radial-gradient(circle at 50% 18%, rgba(237, 208, 64, 0.28) 0%, transparent 34%),
+    linear-gradient(180deg, #FFF9E8 0%, #FFFDF8 100%);
+  box-shadow: 0 12px 30px rgba(42, 33, 24, 0.10);
+  overflow: hidden;
+}
+
+.winner-burst::before,
+.winner-burst::after {
+  content: '';
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+
+.winner-burst::before { top: 8px; }
+.winner-burst::after { bottom: 8px; }
+
+.winner-kicker {
+  display: block;
+  font-size: 10.5px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--gold-text);
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.podium {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.podium-card {
+  min-width: 0;
+  padding: 10px 8px;
+  border: 1px solid var(--hair);
+  border-radius: 10px;
+  background: var(--paper);
+  box-shadow: 0 4px 12px rgba(42, 33, 24, 0.06);
+}
+
+.podium-card.rank-1 {
+  border-color: rgba(201, 162, 39, 0.65);
+  background: #FFF8DF;
+}
+
+.podium-card.me {
+  border-color: var(--green);
+  background: #F1F7F2;
+}
+
+.podium-rank {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  margin: 0 auto 6px;
+  border-radius: 50%;
+  color: #fff;
+  background: var(--red);
+  font-weight: 800;
+}
+
+.podium-card.rank-1 .podium-rank { background: var(--gold-text); }
+
+.podium-card strong,
+.podium-card span:last-child {
+  display: block;
+}
+
+.podium-card strong {
+  overflow-wrap: anywhere;
+  font-size: 13px;
+  line-height: 1.2;
+}
+
+.podium-card span:last-child {
+  margin-top: 4px;
+  color: var(--green);
+  font-weight: 800;
+}
+
+.final-board {
+  text-align: left;
+  max-height: min(42vh, 360px);
+  overflow: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .final-reveal { animation: none; }
+}
+
 /* ---------- live event: host dashboard ---------- */
 
 .host { padding-top: 4px; }
@@ -814,11 +940,29 @@ body::after {
     flex-direction: column;
   }
 
-  .kalam {
-    width: calc(132px + 44px * var(--kalam-fill));
-    height: calc(132px + 44px * var(--kalam-fill));
-    margin: 10px auto 2px;
+  .subtitle { margin-top: 10px; }
+  .maveli-wrap { margin-bottom: 8px; }
+  .maveli { width: min(104px, 28vw); }
+  .feedback-strip {
+    grid-template-columns: 82px 1fr;
+    gap: 10px;
+    margin-top: 10px;
+    padding: 8px 10px;
   }
+  .feedback-copy .btn { margin-top: 8px; }
+  .mode-row { flex-direction: column; }
+  .mode-btn { width: 100%; }
+  .podium { grid-template-columns: 1fr; }
+  .podium-card {
+    display: grid;
+    grid-template-columns: 32px 1fr auto;
+    align-items: center;
+    gap: 8px;
+    text-align: left;
+  }
+  .podium-rank { margin: 0; }
+  .podium-card span:last-child { margin-top: 0; }
+  .final-board { max-height: none; }
   .title  { font-size: 24px; }
   .q      { font-size: 17.5px; }
   .score  { font-size: 34px; }
@@ -831,61 +975,18 @@ body::after {
   .joincode { font-size: 34px; }
 }
 
-/* ---------- desktop: two-column layout — pookalam left, panel right ----------
-
-   Above 640px the narrow card is replaced by a side-by-side grid. The pookalam
-   (which doubles as score feedback) gets a generous left column; the question
-   or start content fills the right column. Both areas scale with vmin so the
-   balance holds from a 13" laptop to a wide monitor.
-
-   :has() fallback: browsers without :has() keep the mobile single-column layout
-   rather than breaking — acceptable on older browsers. */
+/* ---------- desktop layout ---------- */
 @media (min-width: 640px) {
-  /* Solo quiz, result screen, and join participant — anything that isn't the
-     full-screen host projector view — get the two-column treatment. */
   .stage:not(:has(.host)) {
-    max-width: min(880px, 93vw);
-    display: grid;
-    grid-template-columns: auto 1fr;
-    grid-template-rows: auto auto 1fr;
+    max-width: min(560px, 93vw);
   }
 
-  /* Kasavu gold strip runs the full width above both columns */
-  .stage:not(:has(.host)) .kasavu {
-    grid-column: 1 / -1;
-    grid-row: 1;
-  }
-
-  /* Progress bar sits in the right column, above the panel */
   .stage:not(:has(.host)) #progress {
-    grid-column: 2;
-    grid-row: 2;
-    padding: 20px 28px 0;
-    border-left: 1px solid var(--hair);
+    padding: 18px 28px 0;
   }
 
-  /* Pookalam spans rows 2–3 so it centres vertically against both the
-     progress bar and the panel content beside it. Sized up on dark so it
-     glows like a lamp — 38vmin gives generous presence without crowding. */
-  .stage:not(:has(.host)) .kalam {
-    grid-column: 1;
-    grid-row: 2 / 4;
-    width: clamp(220px, 38vmin, 420px);
-    height: clamp(220px, 38vmin, 420px);
-    margin: 0 16px 0 28px;
-    align-self: center;
-    justify-self: center;
-  }
-
-  /* Panel is right column, bottom row. flex column so children stack naturally */
   .stage:not(:has(.host)) .panel {
-    grid-column: 2;
-    grid-row: 3;
-    padding: 12px 32px 36px;
-    border-left: 1px solid rgba(201, 162, 39, 0.15);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+    padding: 14px 32px 36px;
   }
 }
 
@@ -931,4 +1032,49 @@ body::after {
 
   /* Bigger, so "this board is live" reads from the back of the room. */
   .stage:has(.host) .pulse { width: clamp(9px, 0.9vw, 18px); height: clamp(9px, 0.9vw, 18px); }
+
+  .stage:has(.host) .host-reveal .winner-burst {
+    padding: clamp(22px, 2.5vw, 48px);
+    margin-top: clamp(10px, 1vw, 20px);
+  }
+
+  .stage:has(.host) .host-reveal .winner-kicker {
+    font-size: clamp(14px, 1.3vw, 26px);
+  }
+
+  .stage:has(.host) .host-reveal .host-title {
+    font-size: clamp(46px, 6vw, 112px);
+    margin: 8px 0;
+  }
+
+  .stage:has(.host) .host-reveal .score {
+    font-size: clamp(54px, 7vw, 128px);
+  }
+
+  .stage:has(.host) .podium {
+    gap: clamp(12px, 1.5vw, 28px);
+    margin-top: clamp(16px, 1.8vw, 34px);
+  }
+
+  .stage:has(.host) .podium-card {
+    padding: clamp(14px, 1.4vw, 28px);
+  }
+
+  .stage:has(.host) .podium-rank {
+    width: clamp(36px, 3.2vw, 68px);
+    height: clamp(36px, 3.2vw, 68px);
+    font-size: clamp(18px, 1.8vw, 34px);
+  }
+
+  .stage:has(.host) .podium-card strong {
+    font-size: clamp(18px, 1.7vw, 34px);
+  }
+
+  .stage:has(.host) .podium-card span:last-child {
+    font-size: clamp(18px, 1.7vw, 34px);
+  }
+
+  .stage:has(.host) .final-board {
+    max-height: 28vh;
+  }
 }

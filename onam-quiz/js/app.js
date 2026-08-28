@@ -1,10 +1,7 @@
 /* State machine + rendering.
 
    Four screens, one render() and no router:
-     start -> question -> feedback -> (question | result) -> start
-
-   The pookalam SVG is built once and mutated in place, so rings keep their
-   bloom animation instead of being torn down on every render. */
+     start -> question -> feedback -> (question | result) -> start */
 
 const state = {
   screen: 'start',   // start | question | feedback | result
@@ -19,19 +16,18 @@ const state = {
 
 const el = {
   progress: null,
-  panel: null,
-  kalam: null
+  panel: null
 };
 
 const BEST_KEY = 'onam-pookalam-best';
 
 function scoreMessage(score, total) {
   const pct = score / total;
-  if (score === total) return 'Perfect. Every ring in full bloom.';
-  if (pct >= 0.8) return 'Onam Ashamsakal! A pookalam worth photographing.';
-  if (pct >= 0.6) return 'A fine pookalam, a few petals short of glory.';
-  if (pct >= 0.4) return 'Half in bloom. The sadya is still yours.';
-  return 'Mostly bare earth. Come back for another round.';
+  if (score === total) return 'Perfect. Maveli is dancing for you.';
+  if (pct >= 0.8) return 'Onam Ashamsakal! Maveli is properly impressed.';
+  if (pct >= 0.6) return 'A strong round, with plenty of happy cheers.';
+  if (pct >= 0.4) return 'Halfway there. Maveli still believes in you.';
+  return 'A tough round. Maveli gives a gentle sigh and a second chance.';
 }
 
 function bestScore() {
@@ -67,90 +63,17 @@ function renderProgress() {
     <div class="bar"><i style="width:${pct}%"></i></div>`;
 }
 
-/* King Maveli — the beloved king who descends from Vaikuntha every Onam to
-   visit his people. Drawn as a simple SVG character: umbrella, crown, third eye,
-   garland, mundum gold border. Floats gently to show he has just descended. */
-const MAVELI_SVG = `
-<svg class="maveli" viewBox="0 0 100 160" xmlns="http://www.w3.org/2000/svg"
-     role="img" aria-label="King Maveli, the Onam king">
-  <!-- umbrella stick -->
-  <line x1="50" y1="28" x2="50" y2="68" stroke="#C9A227" stroke-width="3"
-        stroke-linecap="round"/>
-  <!-- umbrella canopy -->
-  <path d="M16 30 Q50 8 84 30 Q67 25 50 27 Q33 25 16 30Z" fill="#C9A227"/>
-  <path d="M16 30 Q33 37 50 27 Q67 37 84 30" fill="none" stroke="#EDD040"
-        stroke-width="1.5" stroke-linecap="round"/>
-  <!-- tassels -->
-  <line x1="28" y1="32" x2="26" y2="42" stroke="#EDD040" stroke-width="1.5"
-        stroke-linecap="round"/>
-  <line x1="72" y1="32" x2="74" y2="42" stroke="#EDD040" stroke-width="1.5"
-        stroke-linecap="round"/>
-  <!-- crown -->
-  <path d="M27 66 L32 55 L37 63 L43 50 L50 61 L57 50 L63 63 L68 55 L73 66Z"
-        fill="#EDD040" stroke="#C9A227" stroke-width="1"/>
-  <!-- crown gems -->
-  <circle cx="43" cy="53" r="2.5" fill="#E05858"/>
-  <circle cx="50" cy="61" r="2.5" fill="#3DBF68"/>
-  <circle cx="57" cy="53" r="2.5" fill="#E05858"/>
-  <!-- head -->
-  <circle cx="50" cy="86" r="19" fill="#C8895A"/>
-  <!-- forehead bindi / third eye -->
-  <ellipse cx="50" cy="80" rx="4.5" ry="3" fill="#A8201A" stroke="#7A1A1A"
-           stroke-width="0.5"/>
-  <circle cx="50" cy="80" r="1.5" fill="#2A0808"/>
-  <!-- eyebrows -->
-  <path d="M40 86 Q44 83 48 84" fill="none" stroke="#5A3520" stroke-width="1.5"
-        stroke-linecap="round"/>
-  <path d="M52 84 Q56 83 60 86" fill="none" stroke="#5A3520" stroke-width="1.5"
-        stroke-linecap="round"/>
-  <!-- eyes -->
-  <ellipse cx="44" cy="89" rx="3" ry="2" fill="#2A1810"/>
-  <ellipse cx="56" cy="89" rx="3" ry="2" fill="#2A1810"/>
-  <circle cx="44.8" cy="88.5" r="1" fill="#fff"/>
-  <circle cx="56.8" cy="88.5" r="1" fill="#fff"/>
-  <!-- smile -->
-  <path d="M43 95 Q50 101 57 95" fill="none" stroke="#5A3520" stroke-width="2"
-        stroke-linecap="round"/>
-  <!-- moustache -->
-  <path d="M43 92 Q47 94 50 92 Q53 94 57 92" fill="none" stroke="#3A2010"
-        stroke-width="1.5" stroke-linecap="round"/>
-  <!-- ears -->
-  <ellipse cx="31" cy="88" rx="4" ry="5" fill="#C8895A"/>
-  <ellipse cx="69" cy="88" rx="4" ry="5" fill="#C8895A"/>
-  <!-- earrings -->
-  <circle cx="31" cy="93" r="2.5" fill="#EDD040"/>
-  <circle cx="69" cy="93" r="2.5" fill="#EDD040"/>
-  <!-- neck -->
-  <path d="M38 106 Q50 101 62 106" stroke="#C8895A" stroke-width="9" fill="none"
-        stroke-linecap="round"/>
-  <!-- body / mundum -->
-  <ellipse cx="50" cy="136" rx="28" ry="22" fill="#F0E8D8"/>
-  <!-- mundum kasavu border -->
-  <path d="M22 155 Q50 162 78 155" stroke="#C9A227" stroke-width="4" fill="none"
-        stroke-linecap="round"/>
-  <!-- garland / mala -->
-  <path d="M37 114 Q50 109 63 114" fill="none" stroke="#F08C00" stroke-width="3"
-        stroke-linecap="round"/>
-  <circle cx="42" cy="114" r="2.5" fill="#F08C00"/>
-  <circle cx="50" cy="110" r="2.5" fill="#F08C00"/>
-  <circle cx="58" cy="114" r="2.5" fill="#F08C00"/>
-  <!-- hands / arms hinting -->
-  <line x1="22" y1="125" x2="14" y2="118" stroke="#C8895A" stroke-width="6"
-        stroke-linecap="round"/>
-  <line x1="78" y1="125" x2="86" y2="118" stroke="#C8895A" stroke-width="6"
-        stroke-linecap="round"/>
-  <!-- blessing hand gesture (right) -->
-  <circle cx="86" cy="116" r="5" fill="#C8895A"/>
-</svg>`;
-
 function renderStart() {
   const best = bestScore();
   el.panel.innerHTML = `
     <p class="subtitle">ഓണാശംസകൾ &middot; Onam 2025</p>
-    <div class="maveli-wrap">${MAVELI_SVG}</div>
+    <div class="maveli-wrap">
+      <img class="maveli" src="img/maveli-welcome.png?v=20"
+           alt="King Maveli welcoming you to the quiz">
+    </div>
     <h1 class="title">Onam Pookalam Quiz</h1>
-    <p class="lede">Ten questions. Every answer lays another ring of flowers.
-       Finish the quiz, finish the pookalam.</p>
+    <p class="lede">Ten questions. Maveli cheers every right answer and sighs
+       along with every miss.</p>
     ${best ? `<p class="best">&#9733; Your best: ${best} / ${questions.length}</p>` : ''}
     <button class="btn" id="startBtn">&#9654; Start Solo Quiz</button>
     <div class="mode-divider"><span>or play together</span></div>
@@ -195,16 +118,29 @@ function renderQuestion() {
   }).join('');
 
   const last = state.index === questions.length - 1;
+  const reactionSrc = correct ? 'img/maveli-happy.png?v=20' : 'img/maveli-sigh.png?v=20';
+  const reactionAlt = correct
+    ? 'King Maveli celebrating a correct answer'
+    : 'King Maveli giving a sympathetic sigh for a wrong answer';
 
   el.panel.innerHTML = `
     <p class="area">${q.area}</p>
     <h2 class="q">${q.question}</h2>
-    <div class="opts">${opts}</div>
+    <div class="opts ${answered ? 'answered' : ''}">${opts}</div>
     ${answered ? `
-      <p class="fb ${correct ? 'ok' : 'no'}">
-        ${correct ? 'Correct &mdash; a new ring blooms.' : `Not quite. The answer is ${q.answer}.`}
-      </p>
-      <button class="btn" id="nextBtn">${last ? 'See my pookalam' : 'Next Question'}</button>` : ''}`;
+      <div class="feedback-strip ${correct ? 'ok' : 'no'}">
+        <div class="reaction ${correct ? 'ok' : 'no'}">
+          <img src="${reactionSrc}" alt="${reactionAlt}">
+        </div>
+        <div class="feedback-copy">
+          <p class="fb ${correct ? 'ok' : 'no'}">
+            ${correct ? 'Correct &mdash; Maveli is cheering.'
+                      : `Not quite. The answer is ${q.answer}.`}
+          </p>
+          <button class="btn" id="nextBtn">${last ? 'See my score' : 'Next Question'}</button>
+        </div>
+      </div>
+      ` : ''}`;
 
   if (!answered) {
     el.panel.querySelectorAll('.opt').forEach(b => {
@@ -281,7 +217,7 @@ function renderResult() {
      and petals appearing. */
   if (state.score === total) celebratePerfectScore();
   el.panel.innerHTML = `
-    <div class="score">${state.score} / ${total}<small>YOUR POOKALAM IS COMPLETE</small></div>
+    <div class="score">${state.score} / ${total}<small>YOUR FINAL SCORE</small></div>
     <p class="msg">${scoreMessage(state.score, total)}</p>
     ${best > state.score ? `<p class="best">&#9733; Your best is still ${best} / ${total}</p>` : ''}
     <div id="lbSlot"></div>
@@ -292,8 +228,8 @@ function renderResult() {
 
   document.getElementById('againBtn').addEventListener('click', restart);
   document.getElementById('shareBtn').addEventListener('click', () => {
-    const petal = state.score === total ? 'complete! Every ring in full bloom.' : `${state.score} rings deep.`;
-    const text = `I scored ${state.score}/${total} on the Onam Pookalam Quiz! 🌸 My pookalam is ${petal}\nTry it: https://onam-quiz-tegpgzpi.onslate.in`;
+    const mood = state.score === total ? 'Maveli is dancing!' : `Maveli gave me ${state.score} cheers.`;
+    const text = `I scored ${state.score}/${total} on the Onam Pookalam Quiz! ${mood}\nTry it: https://onam-quiz-tegpgzpi.onslate.in`;
     const btn = document.getElementById('shareBtn');
     if (navigator.share) {
       navigator.share({ text }).catch(() => {});
@@ -320,7 +256,7 @@ function renderLeaderboardSlot() {
         <span><i class="rk">${i + 1}</i>${r.player_name || 'Anonymous'}</span>
         <span>${r.score}</span>
       </div>`).join('');
-    slot.innerHTML = `<div class="lb"><h4>Top pookalams</h4>${rows}</div>`;
+    slot.innerHTML = `<div class="lb"><h4>Top scores</h4>${rows}</div>`;
     return;
   }
 
@@ -360,6 +296,7 @@ function renderLeaderboardSlot() {
 }
 
 function render() {
+  document.body.dataset.screen = state.screen;
   /* Restart the panel's fade-in animation on every render so content
      changes feel like arrivals, not instant swaps. The offsetHeight read
      forces a reflow so the browser sees the class removal before re-adding. */
@@ -382,7 +319,6 @@ function choose(opt) {
   state.results[state.index] = correct;
   if (correct) state.score++;
   state.screen = 'feedback';
-  Pookalam.bloomRing(state.index, correct);
   render();
 }
 
@@ -409,7 +345,6 @@ function restart() {
   /* Fresh draw per game: new 10 from the pool, new option order. restart() also
      runs on boot via route(), so the first game is shuffled too. */
   newQuiz();
-  Pookalam.reset();
   render();
 }
 
@@ -429,16 +364,11 @@ function route() {
 
   if (hash === 'host' || hash === 'join') {
     el.progress.hidden = true;
-    Pookalam.build(el.kalam);
-    // The host dashboard has no pookalam of its own; hide it there.
-    el.kalam.style.display = (hash === 'host') ? 'none' : '';
     if (hash === 'host') Live.startHost(el.panel);
     else Live.startJoin(el.panel);
     return;
   }
 
-  el.kalam.style.display = '';
-  Pookalam.build(el.kalam);
   restart();
 }
 
@@ -476,7 +406,6 @@ document.addEventListener('keydown', e => {
 document.addEventListener('DOMContentLoaded', () => {
   el.progress = document.getElementById('progress');
   el.panel = document.getElementById('panel');
-  el.kalam = document.getElementById('kalam');
   route();
   window.addEventListener('hashchange', route);
 });

@@ -13,6 +13,10 @@ const Live = (() => {
     if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
   }
 
+  function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
   /* ---------------- shared rendering ---------------- */
 
   function boardHtml(rows, opts) {
@@ -31,6 +35,46 @@ const Live = (() => {
           </span>
         </div>`;
     }).join('');
+  }
+
+  function finalBoardHtml(rows, opts) {
+    const o = opts || {};
+    const top = rows && rows.length ? rows[0] : null;
+    const topThree = rows && rows.length ? rows.slice(0, 3) : [];
+    const highlight = o.highlight || '';
+    const title = o.title || 'Final standings';
+    const empty = o.emptyText || 'Nobody played this round.';
+
+    if (!top) {
+      return `
+        <div class="final-reveal ${o.host ? 'host-reveal' : ''}">
+          <p class="joinlabel">${escapeHtml(title)}</p>
+          <h1 class="host-title">No scores yet</h1>
+          <p class="lb-note">${empty}</p>
+        </div>`;
+    }
+
+    const podium = topThree.map((r, i) => `
+      <div class="podium-card rank-${i + 1} ${r.player_name === highlight ? 'me' : ''}">
+        <span class="podium-rank">${i + 1}</span>
+        <strong>${escapeHtml(r.player_name || 'Anonymous')}</strong>
+        <span>${r.score} / ${r.total}</span>
+      </div>`).join('');
+
+    return `
+      <div class="final-reveal ${o.host ? 'host-reveal' : ''}">
+        <p class="joinlabel">${escapeHtml(title)}</p>
+        <div class="winner-burst">
+          <span class="winner-kicker">Quiz champion</span>
+          <h1 class="host-title">${escapeHtml(top.player_name || 'Anonymous')}</h1>
+          <div class="score">${top.score} / ${top.total}<small>FINAL SCORE</small></div>
+        </div>
+        <div class="podium">${podium}</div>
+        <div class="lb final-board">${boardHtml(rows, {
+          highlight,
+          emptyText: empty
+        })}</div>
+      </div>`;
   }
 
   function escapeHtml(s) {
@@ -125,14 +169,14 @@ const Live = (() => {
       document.getElementById('hostBody').innerHTML = `
         <div class="joinbar">
           <div class="qrwrap">
-            <img src="img/join-qr.svg" alt="Scan to join the quiz" class="qr">
+            <img src="img/join-qr.svg?v=20" alt="Scan to join the quiz" class="qr">
           </div>
           <div class="joininfo">
             <p class="joinlabel">Scan to join</p>
             <!-- The ?v= must stay in the typed fallback too. Slate caches
                  index.html for a year and ignores _headers, so a bare URL can
                  serve a stale app to any phone that opened it before. -->
-            <p class="joinurl">onam-quiz-tegpgzpi.onslate.in/?v=9#join</p>
+            <p class="joinurl">onam-quiz-tegpgzpi.onslate.in/?v=20#join</p>
             <p class="joinlabel">or enter code</p>
             <p class="joincode">${this.code}</p>
           </div>
@@ -163,11 +207,27 @@ const Live = (() => {
 
     async close() {
       stopPolling();
+      const btn = document.getElementById('closeBtn');
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Revealing...';
+      }
       const res = await Api.closeSession(this.code);
-      const rows = res && res.top ? res.top : [];
       document.getElementById('hostBody').innerHTML = `
-        <p class="joinlabel">Final standings &mdash; session ${this.code}</p>
-        <div class="lb">${boardHtml(rows, { emptyText: 'Nobody played this round.' })}</div>
+        <div class="final-reveal host-reveal">
+          <p class="joinlabel">Final standings - session ${this.code}</p>
+          <h1 class="host-title">Locking final scores</h1>
+          <p class="msg">Closing every quiz screen and preparing the reveal...</p>
+        </div>`;
+      await sleep(POLL_MS + 1200);
+      const board = await Api.board(this.code);
+      const rows = board && board.top ? board.top : (res && res.top ? res.top : []);
+      document.getElementById('hostBody').innerHTML = `
+        ${finalBoardHtml(rows, {
+          host: true,
+          title: 'Final standings - session ' + this.code,
+          emptyText: 'Nobody played this round.'
+        })}
         <button class="btn" id="againBtn">Run another round</button>`;
       document.getElementById('againBtn').addEventListener('click', () => {
         this.code = null;
@@ -184,7 +244,9 @@ const Live = (() => {
     name: '',
     index: 0,
     score: 0,
+    answered: 0,
     ended: false,
+    finished: false,
     watchTimer: null,
 
     /* While a player is answering, poll their own session's status so a host
@@ -207,18 +269,37 @@ const Live = (() => {
       if (res && res.status && res.status !== 'open') this.endedByHost();
     },
 
-    endedByHost() {
+    async endedByHost() {
       if (this.ended) return;
       this.ended = true;
       this.stopWatch();
-      updater.reset();
       const played = this.rowid != null;
+      const body = document.getElementById('joinBody');
+      if (!body) return;
+      body.innerHTML = `
+        <h1 class="title">Final scores are coming in</h1>
+        <p class="lede">${played
+          ? `Locking your score at <strong>${this.score} / ${questions.length}</strong>.`
+          : 'The host closed this quiz.'}</p>
+        <p class="msg">Building the final leaderboard...</p>`;
+
+      if (played) {
+        await updater.flush();
+        await Api.updateScore(this.rowid, this.score, this.answered, questions.length);
+        await sleep(700);
+      } else {
+        updater.reset();
+      }
+
+      const res = await Api.board(this.code);
+      const rows = res && res.top ? res.top : [];
       document.getElementById('joinBody').innerHTML = `
-        <h1 class="title">The round has ended</h1>
-        <p class="lede">The host closed this quiz.${played
-          ? ` Your final score is <strong>${this.score} / ${questions.length}</strong>.`
-          : ''}</p>
-        <p class="msg">Look up at the host's screen for the final standings.</p>`;
+        ${finalBoardHtml(rows, {
+          highlight: this.name,
+          title: 'Final standings',
+          emptyText: 'Nobody played this round.'
+        })}
+        ${played ? `<p class="msg">Your score: ${this.score} / ${questions.length}</p>` : ''}`;
     },
 
     async mount(root) {
@@ -275,9 +356,10 @@ const Live = (() => {
       this.rowid = res.rowid;
       this.index = 0;
       this.score = 0;
+      this.answered = 0;
       this.ended = false;
+      this.finished = false;
       updater.reset();
-      Pookalam.reset();
       this.startWatch();
       this.renderQuestion();
     },
@@ -286,6 +368,10 @@ const Live = (() => {
       const q = questions[this.index];
       const correct = answered && picked === q.answer;
       const last = this.index === questions.length - 1;
+      const reactionSrc = correct ? 'img/maveli-happy.png?v=20' : 'img/maveli-sigh.png?v=20';
+      const reactionAlt = correct
+        ? 'King Maveli celebrating a correct answer'
+        : 'King Maveli giving a sympathetic sigh for a wrong answer';
 
       const opts = q.options.map((opt, i) => {
         const letter = String.fromCharCode(65 + i);
@@ -310,13 +396,21 @@ const Live = (() => {
         <div class="bar"><i style="width:${Math.round(((this.index + 1) / questions.length) * 100)}%"></i></div>
         <p class="area">${q.area}</p>
         <h2 class="q">${escapeHtml(q.question)}</h2>
-        <div class="opts">${opts}</div>
+        <div class="opts ${answered ? 'answered' : ''}">${opts}</div>
         ${answered ? `
-          <p class="fb ${correct ? 'ok' : 'no'}">
-            ${correct ? 'Correct &mdash; a new ring blooms.'
-                      : 'Not quite. The answer is ' + escapeHtml(q.answer) + '.'}
-          </p>
-          <button class="btn" id="jNext">${last ? 'Finish' : 'Next Question'}</button>` : ''}`;
+          <div class="feedback-strip ${correct ? 'ok' : 'no'}">
+            <div class="reaction ${correct ? 'ok' : 'no'}">
+              <img src="${reactionSrc}" alt="${reactionAlt}">
+            </div>
+            <div class="feedback-copy">
+              <p class="fb ${correct ? 'ok' : 'no'}">
+                ${correct ? 'Correct &mdash; Maveli is cheering.'
+                          : 'Not quite. The answer is ' + escapeHtml(q.answer) + '.'}
+              </p>
+              <button class="btn" id="jNext">${last ? 'Finish' : 'Next Question'}</button>
+            </div>
+          </div>
+          ` : ''}`;
 
       if (!answered) {
         document.querySelectorAll('#joinBody .opt').forEach(b => {
@@ -331,7 +425,7 @@ const Live = (() => {
       const q = questions[this.index];
       const correct = opt === q.answer;
       if (correct) this.score++;
-      Pookalam.bloomRing(this.index, correct);
+      this.answered = this.index + 1;
       this.renderQuestion(true, opt);
       /* Queued, not fired directly — see `updater` above. Still never blocks the
          UI, but writes can no longer land out of order. */
@@ -345,11 +439,10 @@ const Live = (() => {
     },
 
     async finish() {
-      /* Player reached the end on their own — stop watching so a later host
-         close doesn't replace their completed screen with the ended notice. */
-      this.stopWatch();
+      this.finished = true;
+      this.answered = questions.length;
       document.getElementById('joinBody').innerHTML = `
-        <div class="score">${this.score} / ${questions.length}<small>YOUR POOKALAM IS COMPLETE</small></div>
+        <div class="score">${this.score} / ${questions.length}<small>YOUR FINAL SCORE</small></div>
         <p class="msg" id="finishMsg">Sending your final score&hellip;</p>`;
 
       /* Wait for the queue to drain, then send one authoritative final write.
@@ -359,7 +452,8 @@ const Live = (() => {
       await Api.updateScore(this.rowid, this.score, questions.length, questions.length);
 
       const msg = document.getElementById('finishMsg');
-      if (msg) msg.textContent = "Your score is on the host's leaderboard. Look up.";
+      if (msg) msg.textContent = "Score saved. Waiting for the host's grand reveal...";
+      this.startWatch();
     }
   };
 
