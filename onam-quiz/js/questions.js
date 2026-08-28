@@ -1,6 +1,6 @@
 /* Quiz data and the per-game draw.
 
-   A POOL of 16, not a fixed list of 10. Every game draws 10 at random and
+   A POOL of 32, not a fixed list of 10. Every game draws 10 at random and
    shuffles each question's options, so a second play is a genuinely different
    quiz rather than the same 10 in a new order. That matters here: the host runs
    several rounds on stage, and people replay to beat their score.
