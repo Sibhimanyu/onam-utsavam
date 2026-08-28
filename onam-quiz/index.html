@@ -19,13 +19,21 @@
        Then confirm the QR and the typed fallback in live.js still agree. -->
   <link rel="stylesheet" href="styles.css?v=21">
 
-  <!-- The two reaction images are needed within seconds of the quiz starting,
-       but nothing references them until the first answer is scored, so without
-       this the reaction slot sits empty while the file downloads. As WebP they
-       are ~82KB for the pair, which is worth spending up front. type= gates
-       the hint, so browsers without WebP skip it and fall back to the PNG. -->
-  <link rel="preload" as="image" type="image/webp" href="img/maveli-happy.webp?v=21">
-  <link rel="preload" as="image" type="image/webp" href="img/maveli-sigh.webp?v=21">
+  <!-- Warm the two reaction images. Nothing references them until the first
+       answer is scored, so without a hint the reaction slot sits empty while
+       the file downloads mid-quiz. As WebP they are ~82KB for the pair.
+
+       prefetch, not preload: the player has to read this screen, press start
+       and read a question first, so these are never needed "now". preload
+       promises immediate use and Chrome logs an unused-resource warning on
+       every session when that promise is not kept; prefetch is the hint that
+       actually means likely-needed-soon, and it fetches at idle priority so
+       it does not compete with the CSS and JS above.
+
+       type= gates the hint, so browsers without WebP skip it and load the
+       PNG fallback on demand. -->
+  <link rel="prefetch" as="image" type="image/webp" href="img/maveli-happy.webp?v=21">
+  <link rel="prefetch" as="image" type="image/webp" href="img/maveli-sigh.webp?v=21">
 </head>
 <body>
   <main class="stage">
