@@ -157,8 +157,15 @@ const Live = (() => {
       if (!res || !res.code) {
         btn.disabled = false;
         btn.textContent = 'Start the quiz';
+        /* Api.call() collapses every failure to null — offline, timeout, 404,
+           bad JSON are indistinguishable here — so this cannot name a cause.
+           It used to guess at a specific backend cause and name an internal
+           table, which was usually wrong and put schema on a projector. Keep
+           this cause-neutral, and keep backend names out of client source:
+           there is no build step, so comments ship too. The button is
+           re-enabled above, so point at the retry that actually exists. */
         document.getElementById('hostErr').textContent =
-          'Could not open a session. The Quiz_Sessions table may not exist yet.';
+          'Could not start a round. Check the connection and press start again.';
         return;
       }
       this.code = res.code;
