@@ -5,7 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Onam Pookalam Quiz</title>
   <!-- Keep asset versions aligned when deploying through an intermediary cache. -->
-  <link rel="stylesheet" href="styles.css?v=27">
+  <!-- Type stack per DESIGN.md: Fraunces (display), Anek Malayalam (UI/body,
+       Latin + Malayalam as one family), IBM Plex Sans Condensed (scores,
+       timers, room codes — tabular), Chilanka (flourish, one use per screen). -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..900,0..100,0..1;1,9..144,300..900,0..100,0..1&family=Anek+Malayalam:wght@300..700&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=Chilanka&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=28">
 
   <!-- Warm the two reaction images. Nothing references them until the first
        answer is scored, so without a hint the reaction slot sits empty while
@@ -41,6 +47,6 @@
   <script src="js/firebase-config.js?v=1"></script>
   <script src="js/api.js?v=21"></script>
   <script src="js/live.js?v=22"></script>
-  <script src="js/app.js?v=21"></script>
+  <script src="js/app.js?v=22"></script>
 </body>
 </html>

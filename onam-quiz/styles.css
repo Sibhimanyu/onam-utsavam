@@ -1,5 +1,7 @@
 /* Onam Pookalam Quiz — warm Kerala festival palette on handloom cream.
-   No frameworks, no external fonts. System font stack only. */
+   Design source of truth: DESIGN.md at repo root. Two acts, one festival:
+   Day (phones — this default palette) and Dusk (projector — the
+   body:has(.host) block at the end flips every token to the dark stage). */
 
 :root {
   --cream:     #FBF6EC;
@@ -17,8 +19,13 @@
   --muted:     #6F685D;   /* 5.11:1 on cream */
   --rank:      #8A8275;
 
-  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
-  --sans:  -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  /* Buttons carry ink on marigold in both acts; a variable would flip it. */
+  --btn-ink:   #2A2118;
+
+  --serif: "Fraunces", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  --sans:  "Anek Malayalam", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --data:  "IBM Plex Sans Condensed", "Avenir Next Condensed", "Arial Narrow", sans-serif;
+  --flourish: "Chilanka", cursive;
 }
 
 * { box-sizing: border-box; }
@@ -102,8 +109,10 @@ body::after {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
+  font-family: var(--data);
+  font-weight: 500;
   font-variant-numeric: tabular-nums;
-  font-size: 12.5px;
+  font-size: 13px;
   color: var(--muted);
   letter-spacing: .02em;
   margin-bottom: 6px;
@@ -183,6 +192,12 @@ body::after {
 .subtitle-ml {
   letter-spacing: normal;
   text-transform: none;
+  /* The one Chilanka flourish this screen gets (DESIGN.md: exactly one use
+     per screen, or none). Handwriting = human hand = pookalam-making. */
+  font-family: var(--flourish);
+  font-size: 17px;
+  font-weight: 400;
+  color: var(--red);
 }
 
 .maveli-wrap {
@@ -202,6 +217,9 @@ body::after {
 .title {
   font-family: var(--serif);
   font-size: clamp(28px, 4vw, 40px);
+  font-weight: 800;
+  /* Fraunces wonk axis ON for celebration screens, OFF for questions. */
+  font-variation-settings: "opsz" 144, "SOFT" 40, "WONK" 1;
   line-height: 1.1;
   text-wrap: balance;
   text-align: center;
@@ -250,6 +268,8 @@ body::after {
 
 .q {
   font-family: var(--serif);
+  font-weight: 600;
+  font-variation-settings: "opsz" 40, "WONK" 0;
   font-size: 19px;
   line-height: 1.35;
   margin: 0 0 14px;
@@ -281,7 +301,7 @@ body::after {
   color: var(--ink);
   background: var(--paper);
   border: 1px solid var(--hair);
-  border-radius: 10px;
+  border-radius: 4px;
   cursor: pointer;
   /* Guaranteed, not inferred. Options happened to render at 47px from padding
      alone, but Start Quiz landed at 42px and .btn.small smaller still. A floor
@@ -302,23 +322,30 @@ body::after {
    disabled but must stay readable — especially the correct one. */
 .opt:disabled { cursor: default; color: var(--ink); opacity: 1; }
 
+/* Ballot marker: a Malayalam numeral (൧ ൨ ൩ ൪) with a small Latin subscript.
+   DESIGN.md: only the pookalam is circular — the marker is bare typography,
+   not a badge. The data face keeps the column steady across rows. */
 .opt .k {
   flex: 0 0 auto;
-  width: 21px;
-  height: 21px;
-  border-radius: 50%;
-  border: 1px solid var(--hair);
-  display: grid;
-  place-items: center;
-  font-size: 11px;
-  font-weight: 600;
+  min-width: 26px;
+  font-family: var(--data);
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--gold-text);
+}
+
+.opt .k sub {
+  font-size: 10px;
+  font-weight: 500;
   color: var(--muted);
+  margin-left: 1px;
 }
 
 .opt.good { border-color: var(--green); background: #F1F7F2; }
-.opt.good .k { background: var(--green); border-color: var(--green); color: #fff; }
+.opt.good .k { color: var(--green); }
 .opt.bad  { border-color: var(--red); background: #FCF1F0; }
-.opt.bad .k { background: var(--red); border-color: var(--red); color: #fff; }
+.opt.bad .k { color: var(--red); }
 .opt.dim  { opacity: .5; }
 .opts.answered .opt.dim { display: none; }
 
@@ -469,11 +496,14 @@ body::after {
 :where(.opt, .btn, .lb-form input, button):focus-visible {
   outline: 2px solid var(--red);
   outline-offset: 2px;
-  border-radius: 10px;
+  border-radius: 4px;
 }
 
 /* ---------- buttons ---------- */
 
+/* Primary action per DESIGN.md: solid marigold with ink text — marigold is
+   the active color; gradients don't label actions here. Red stays ceremonial
+   (titles, wrong-state, the ghost close-round button). */
 .btn {
   display: block;
   width: 100%;
@@ -483,20 +513,20 @@ body::after {
   font-size: 14.5px;
   font-weight: 700;
   letter-spacing: .04em;
-  color: #fff;
-  background: linear-gradient(160deg, #C5301A 0%, #A8201A 100%);
+  color: var(--btn-ink);
+  background: var(--marigold);
   border: 0;
-  border-radius: 10px;
+  border-radius: 4px;
   cursor: pointer;
   min-height: 44px;
-  box-shadow: 0 4px 16px rgba(168, 32, 26, .28), inset 0 1px 0 rgba(255,255,255,.12);
+  box-shadow: 0 4px 16px rgba(240, 140, 0, .26);
   transition: background .16s ease, transform .16s ease, box-shadow .16s ease;
 }
 
 .btn:hover {
-  background: linear-gradient(160deg, #A82818 0%, #8E1A15 100%);
+  background: #D97B00;
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(168, 32, 26, .34), inset 0 1px 0 rgba(255,255,255,.12);
+  box-shadow: 0 6px 20px rgba(240, 140, 0, .32);
 }
 .btn.small { width: auto; margin: 0; padding: 10px 16px; font-size: 14px; min-height: 44px; }
 
@@ -644,8 +674,8 @@ body::after {
 
 .score small {
   display: block;
-  font-family: var(--sans);
-  font-size: 10.5px;
+  font-family: var(--data);
+  font-size: 11px;
   font-weight: 600;
   letter-spacing: .13em;
   color: var(--muted);
@@ -903,11 +933,12 @@ body::after {
 
 /* The code is read off a projector from the back of a room. Big, spaced, mono. */
 .joincode {
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  /* DESIGN.md: the room code is display typography, not a badge. */
+  font-family: var(--data);
   font-variant-numeric: tabular-nums;
   font-size: 38px;
   font-weight: 700;
-  letter-spacing: .14em;
+  letter-spacing: .18em;
   line-height: 1;
   color: var(--red);
   margin: 0;
@@ -933,7 +964,8 @@ body::after {
   display: flex;
   align-items: baseline;
   gap: 8px;
-  font-weight: 650;
+  font-family: var(--data);
+  font-weight: 600;
   /* The board repaints every 3s while scores climb. With proportional digits a
      6 becoming a 7 shifts the column; tabular figures hold the position. */
   font-variant-numeric: tabular-nums;
@@ -1165,3 +1197,80 @@ body::after {
     margin-top: 10px;
   }
 }
+
+/* ---------- Act II: Dusk — the projector stage ----------
+
+   DESIGN.md assigns theme by surface, not user preference: phones keep the
+   daylight handbill above; the host/projector view plays at dusk. A pookalam
+   is laid in daylight; the nilavilakku is lit in the evening. Practically:
+   projectors crush cream backgrounds, and the finale earns the lamp-lit
+   drama. Because every component reads the custom properties, redefining the
+   tokens flips the whole host view; the overrides below only catch the few
+   hardcoded light hexes. Depth at dusk is light bloom (glow), not shadows.
+   Fallback is graceful: no :has() support = the daytime palette, unchanged. */
+
+body:has(.host) {
+  --cream:     #241A0F;   /* joinbar ground -> stage surface */
+  --paper:     #241A0F;
+  --earth:     #332514;
+  --ink:       #F6EDDD;   /* kasavu cream — the day background becomes the ink */
+  --hair:      #3E2F1B;
+  --red:       #E4572E;   /* chethi */
+  --marigold:  #FFA02E;   /* lamp-flame — brighter so it emits on dark */
+  --green:     #4E9F63;   /* banana-leaf, lifted for the dark ground */
+  --gold:      #D9A82F;
+  --gold-text: #D9A82F;
+  --muted:     #9A8467;
+  --rank:      #9A8467;
+
+  background:
+    radial-gradient(ellipse 120% 50% at 50% 0%, rgba(217, 168, 47, .08) 0%, transparent 60%),
+    radial-gradient(ellipse 80% 60% at 8% 92%, rgba(255, 160, 46, .06) 0%, transparent 55%),
+    #161008;   /* char-brown, not pure black — projectors crush #000 */
+}
+
+/* The scattered-petal dot grid glows faintly instead of printing. */
+body:has(.host)::after {
+  background:
+    radial-gradient(circle, rgba(217, 168, 47, 0.10) 1px, transparent 1px),
+    radial-gradient(circle, rgba(255, 160, 46, 0.06) 1.5px, transparent 1.5px);
+  background-size: 54px 54px, 81px 81px;
+}
+
+.stage:has(.host) {
+  background: #1D150B;
+  border-color: rgba(217, 168, 47, 0.40);
+  box-shadow:
+    0 0 0 5px rgba(217, 168, 47, 0.08),
+    0 0 44px rgba(217, 168, 47, 0.10),
+    0 24px 60px rgba(0, 0, 0, 0.50);
+}
+
+/* Titles wear the kasavu, not chethi — red is for urgency at dusk. */
+body:has(.host) .host-title { color: var(--ink); }
+
+/* The room code is the lamp: flame marigold with a soft bloom. */
+body:has(.host) .joincode {
+  color: var(--marigold);
+  text-shadow: 0 0 34px rgba(255, 160, 46, 0.35);
+}
+
+/* QR quiet zone stays paper-white for scan contrast — it is signage. */
+body:has(.host) .qrwrap { background: #fff; border-color: rgba(217, 168, 47, 0.35); }
+
+body:has(.host) .btn.ghost:hover { background: #332514; }
+
+body:has(.host) .winner-burst {
+  background:
+    radial-gradient(circle at 50% 18%, rgba(217, 168, 47, 0.16) 0%, transparent 40%),
+    #241A0F;
+  border-color: rgba(217, 168, 47, 0.45);
+  box-shadow: 0 0 28px rgba(217, 168, 47, 0.16);
+}
+
+body:has(.host) .podium-card { box-shadow: none; }
+body:has(.host) .podium-card.rank-1 { background: #332514; border-color: rgba(217, 168, 47, 0.55); }
+body:has(.host) .podium-card.me { background: rgba(78, 159, 99, 0.14); }
+
+/* Rank-1 badge: ink numeral on gold keeps its trophy value readable. */
+body:has(.host) .podium-card.rank-1 .podium-rank { color: #2A2118; }

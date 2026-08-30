@@ -108,7 +108,9 @@ function renderQuestion() {
   const correct = answered && state.picked === q.answer;
 
   const opts = q.options.map((opt, i) => {
-    const letter = String.fromCharCode(65 + i);
+    /* Ballot markers per DESIGN.md: Malayalam numerals with a small Latin
+       subscript — answers are quiet typographic rows, never colored tiles. */
+    const letter = `${['൧', '൨', '൩', '൪'][i] || String.fromCharCode(65 + i)}<sub>${i + 1}</sub>`;
     let cls = 'opt';
     if (answered) {
       if (opt === q.answer) cls += ' good';
