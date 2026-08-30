@@ -1,66 +1,36 @@
 # Onam Pookalam Quiz
 
-A browser-based Onam trivia game with a solo leaderboard and a live event
-mode. King Maveli reacts to each answer, and a perfect score brings a shower of
-flower petals.
+A real-time Kerala Onam trivia game for solo play or a room-wide quiz. King
+Maveli celebrates correct answers, hosts can start a QR-join round, and every
+player's progress appears on a live leaderboard.
 
-| Mode | URL | Use |
-|---|---|---|
-| Solo | `/` | Play and post a score |
-| Host | `/#host` | Start and close a live round |
-| Join | `/#join` | Join the active round from a phone |
+## Play online
 
-## Firebase architecture
+| Experience | Link |
+|---|---|
+| Play solo | [onam-pookalam-quiz.web.app](https://onam-pookalam-quiz.web.app/) |
+| Host a live round | [Open host view](https://onam-pookalam-quiz.web.app/#host) |
+| Join a live round | [Open join view](https://onam-pookalam-quiz.web.app/#join) |
 
-The app is a static Firebase Hosting site with no server function:
+## Features
 
-- Firebase Authentication signs each browser in anonymously.
-- Realtime Database stores the active session, live players, and solo scores.
-- Realtime Database listeners push scoreboard and close events directly to
-  clients, replacing the former polling loop.
-- [database.rules.json](database.rules.json) restricts player writes to their
-  anonymous identity. Session creation belongs to the host identity; any signed
-  in device can only close an open session, keeping a projected round recoverable
-  after a browser identity is restored.
+- Solo Onam trivia with a personal best score.
+- Host-controlled live rounds with QR joining and a short room code.
+- Firebase Realtime Database leaderboard updates and round-close events.
+- Projector-ready final standings with the champion, podium, and a scrollable
+  score board.
+- Anonymous Firebase Authentication, so players do not need an account.
 
-```
-.
-├── firebase.json             # Hosting, Emulator, and rules configuration
-├── database.rules.json       # Realtime Database security rules
-└── onam-quiz/                # Firebase Hosting public directory
-    ├── index.html
-    ├── styles.css
-    ├── img/
-    └── js/
-        ├── firebase-config.js
-        ├── api.js            # Firebase adapter
-        ├── live.js           # Host and participant experience
-        ├── app.js            # Solo state machine
-        └── questions.js
-```
+## Technology
 
-## First-time Firebase setup
+- Vanilla HTML, CSS, and JavaScript.
+- Firebase Hosting.
+- Firebase Authentication with anonymous sign-in.
+- Firebase Realtime Database with checked-in security rules.
 
-1. Create a Firebase project and register a Web app in the Firebase console.
-2. Enable **Authentication -> Sign-in method -> Anonymous**.
-3. Create a **Realtime Database** in production mode.
-4. Copy the Firebase Web config into
-   [onam-quiz/js/firebase-config.js](onam-quiz/js/firebase-config.js). The
-   `databaseURL` is required.
-5. Set `window.QUIZ_PUBLIC_URL` to the final Hosting URL, for example
-   `https://your-project.web.app`.
-6. Regenerate the QR image with that exact public URL:
+## Run locally
 
-```bash
-npx qrcode -t svg -o onam-quiz/img/join-qr.svg \
-  "https://your-project.web.app/#join"
-```
-
-Firebase Web config values identify the project; they are not credentials.
-Security is enforced by the checked-in Realtime Database rules. Enable Firebase
-App Check before exposing the app beyond a trusted event audience.
-
-## Local development
+Install the Firebase CLI and sign in once:
 
 ```bash
 npm install -g firebase-tools
@@ -68,36 +38,30 @@ firebase login
 firebase emulators:start
 ```
 
-Open `http://127.0.0.1:5000`. On localhost the app automatically uses the
-Authentication and Realtime Database emulators, so it does not touch the
-production project.
+Open `http://127.0.0.1:5000`. The app uses the Authentication and Realtime
+Database emulators on localhost, keeping local sessions separate from the live
+quiz.
 
-## Deployment
+## Deploy
 
-Choose the Firebase project once for this checkout:
-
-```bash
-firebase use --add
-```
-
-Deploy authentication, rules, and the static app:
+The configured Firebase project is `onam-pookalam-quiz`.
 
 ```bash
-firebase deploy --only auth
-firebase deploy --only database
-firebase deploy --only hosting
+firebase deploy
 ```
 
-`firebase deploy` deploys both. After the first deployment, verify the host
-screen's typed join URL and QR image both point at the Firebase Hosting domain.
+This deploys Hosting, Authentication configuration, and Realtime Database
+rules. The Firebase web configuration in
+[onam-quiz/js/firebase-config.js](onam-quiz/js/firebase-config.js) identifies
+the public project; access control lives in
+[database.rules.json](database.rules.json).
 
-## Live event checklist
+## Live event flow
 
-1. Open `/#host` on the projector and start a round.
-2. Project the generated code and QR image.
-3. Participants scan the code, enter a name, and play independently.
-4. The leaderboard updates immediately as score writes arrive.
-5. Close the round to reveal final standings on every joined device.
+1. Open the [host view](https://onam-pookalam-quiz.web.app/#host) on a shared screen.
+2. Start a round and have players scan the QR code or enter the displayed code.
+3. Players answer independently while the leaderboard updates in real time.
+4. Close the round to reveal the final standings.
 
 ## Licence
 
