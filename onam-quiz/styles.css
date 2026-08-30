@@ -1,7 +1,8 @@
 /* Onam Pookalam Quiz — warm Kerala festival palette on handloom cream.
-   Design source of truth: DESIGN.md at repo root. Two acts, one festival:
-   Day (phones — this default palette) and Dusk (projector — the
-   body:has(.host) block at the end flips every token to the dark stage). */
+   Design source of truth: DESIGN.md at repo root. One palette everywhere:
+   the solo phone flow, the host projector view, and the participant flow
+   all share this warm daylight scheme. (A dark projector variant was tried
+   on 2026-08-30 and rejected — consistency across surfaces won.) */
 
 :root {
   --cream:     #FBF6EC;
@@ -1198,79 +1199,45 @@ body::after {
   }
 }
 
-/* ---------- Act II: Dusk — the projector stage ----------
+/* ---------- back to start ----------
 
-   DESIGN.md assigns theme by surface, not user preference: phones keep the
-   daylight handbill above; the host/projector view plays at dusk. A pookalam
-   is laid in daylight; the nilavilakku is lit in the evening. Practically:
-   projectors crush cream backgrounds, and the finale earns the lamp-lit
-   drama. Because every component reads the custom properties, redefining the
-   tokens flips the whole host view; the overrides below only catch the few
-   hardcoded light hexes. Depth at dusk is light bloom (glow), not shadows.
-   Fallback is graceful: no :has() support = the daytime palette, unchanged. */
+   One quiet way home from every screen that is not the start screen: solo
+   questions, the host dashboard, and the participant flow. Sits in normal
+   flow between the kasavu band and the content so it never overlaps the
+   progress row or the host title. Same palette as everything else —
+   DESIGN.md: one warm cream act across all surfaces. */
 
-body:has(.host) {
-  --cream:     #241A0F;   /* joinbar ground -> stage surface */
-  --paper:     #241A0F;
-  --earth:     #332514;
-  --ink:       #F6EDDD;   /* kasavu cream — the day background becomes the ink */
-  --hair:      #3E2F1B;
-  --red:       #E4572E;   /* chethi */
-  --marigold:  #FFA02E;   /* lamp-flame — brighter so it emits on dark */
-  --green:     #4E9F63;   /* banana-leaf, lifted for the dark ground */
-  --gold:      #D9A82F;
-  --gold-text: #D9A82F;
-  --muted:     #9A8467;
-  --rank:      #9A8467;
+/* The author display below beats the UA's [hidden] { display: none }, so the
+   hidden attribute must be re-armed explicitly or the button shows on the
+   start screen while hidden=true. */
+.back-link[hidden] { display: none; }
 
-  background:
-    radial-gradient(ellipse 120% 50% at 50% 0%, rgba(217, 168, 47, .08) 0%, transparent 60%),
-    radial-gradient(ellipse 80% 60% at 8% 92%, rgba(255, 160, 46, .06) 0%, transparent 55%),
-    #161008;   /* char-brown, not pure black — projectors crush #000 */
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  margin: 12px 22px 0;
+  padding: 8px 14px;
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  color: var(--muted);
+  background: transparent;
+  border: 1px solid var(--hair);
+  border-radius: 4px;
+  cursor: pointer;
+  min-height: 40px;
+  transition: color .16s ease, border-color .16s ease, background .16s ease;
 }
 
-/* The scattered-petal dot grid glows faintly instead of printing. */
-body:has(.host)::after {
-  background:
-    radial-gradient(circle, rgba(217, 168, 47, 0.10) 1px, transparent 1px),
-    radial-gradient(circle, rgba(255, 160, 46, 0.06) 1.5px, transparent 1.5px);
-  background-size: 54px 54px, 81px 81px;
+.back-link:hover {
+  color: var(--red);
+  border-color: var(--red);
+  background: var(--paper);
 }
 
-.stage:has(.host) {
-  background: #1D150B;
-  border-color: rgba(217, 168, 47, 0.40);
-  box-shadow:
-    0 0 0 5px rgba(217, 168, 47, 0.08),
-    0 0 44px rgba(217, 168, 47, 0.10),
-    0 24px 60px rgba(0, 0, 0, 0.50);
+/* Projector: the host stands at the laptop, but the control should still be
+   findable without leaning in. */
+@media (min-width: 900px) {
+  .stage:has(.host) .back-link { font-size: clamp(13px, 1vw, 18px); }
 }
-
-/* Titles wear the kasavu, not chethi — red is for urgency at dusk. */
-body:has(.host) .host-title { color: var(--ink); }
-
-/* The room code is the lamp: flame marigold with a soft bloom. */
-body:has(.host) .joincode {
-  color: var(--marigold);
-  text-shadow: 0 0 34px rgba(255, 160, 46, 0.35);
-}
-
-/* QR quiet zone stays paper-white for scan contrast — it is signage. */
-body:has(.host) .qrwrap { background: #fff; border-color: rgba(217, 168, 47, 0.35); }
-
-body:has(.host) .btn.ghost:hover { background: #332514; }
-
-body:has(.host) .winner-burst {
-  background:
-    radial-gradient(circle at 50% 18%, rgba(217, 168, 47, 0.16) 0%, transparent 40%),
-    #241A0F;
-  border-color: rgba(217, 168, 47, 0.45);
-  box-shadow: 0 0 28px rgba(217, 168, 47, 0.16);
-}
-
-body:has(.host) .podium-card { box-shadow: none; }
-body:has(.host) .podium-card.rank-1 { background: #332514; border-color: rgba(217, 168, 47, 0.55); }
-body:has(.host) .podium-card.me { background: rgba(78, 159, 99, 0.14); }
-
-/* Rank-1 badge: ink numeral on gold keeps its trophy value readable. */
-body:has(.host) .podium-card.rank-1 .podium-rank { color: #2A2118; }

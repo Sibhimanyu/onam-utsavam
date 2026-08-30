@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..900,0..100,0..1;1,9..144,300..900,0..100,0..1&family=Anek+Malayalam:wght@300..700&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=Chilanka&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=28">
+  <link rel="stylesheet" href="styles.css?v=29">
 
   <!-- Warm the two reaction images. Nothing references them until the first
        answer is scored, so without a hint the reaction slot sits empty while
@@ -33,6 +33,8 @@
   <main class="stage">
     <div class="kasavu" aria-hidden="true"></div>
 
+    <button id="backBtn" class="back-link" hidden>&#8249; Home</button>
+
     <div id="progress" class="progress" hidden></div>
 
     <section id="panel" class="panel"></section>
@@ -47,6 +49,6 @@
   <script src="js/firebase-config.js?v=1"></script>
   <script src="js/api.js?v=21"></script>
   <script src="js/live.js?v=22"></script>
-  <script src="js/app.js?v=22"></script>
+  <script src="js/app.js?v=23"></script>
 </body>
 </html>

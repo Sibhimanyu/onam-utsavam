@@ -16,7 +16,8 @@ const state = {
 
 const el = {
   progress: null,
-  panel: null
+  panel: null,
+  back: null
 };
 
 const BEST_KEY = 'onam-pookalam-best';
@@ -331,6 +332,9 @@ function renderLeaderboardSlot() {
 
 function render() {
   document.body.dataset.screen = state.screen;
+  /* The Home button shows on every screen except the start screen itself.
+     Live views (#host/#join) never call render(), so route() handles them. */
+  el.back.hidden = state.screen === 'start';
   /* Restart the panel's fade-in animation on every render so content
      changes feel like arrivals, not instant swaps. The offsetHeight read
      forces a reflow so the browser sees the class removal before re-adding. */
@@ -397,6 +401,7 @@ function route() {
 
   if (hash === 'host' || hash === 'join') {
     el.progress.hidden = true;
+    el.back.hidden = false;
     if (hash === 'host') Live.startHost(el.panel);
     else Live.startJoin(el.panel);
     return;
@@ -439,6 +444,14 @@ document.addEventListener('keydown', e => {
 document.addEventListener('DOMContentLoaded', () => {
   el.progress = document.getElementById('progress');
   el.panel = document.getElementById('panel');
+  el.back = document.getElementById('backBtn');
+  /* Home from anywhere. Live views: clearing the hash re-routes, which also
+     stops the live listeners. Solo mid-quiz: restart() abandons the run and
+     returns to the start screen — same contract as "Play Again". */
+  el.back.addEventListener('click', () => {
+    if (location.hash) location.hash = '';
+    else restart();
+  });
   route();
   window.addEventListener('hashchange', route);
 });

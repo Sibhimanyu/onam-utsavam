@@ -18,20 +18,20 @@
 
 ## Aesthetic Direction
 
-- **Direction:** Festival craft, two acts — *"a pookalam laid in daylight, a
-  nilavilakku lit at dusk."* Organic/ceremonial, editorial discipline.
+- **Direction:** Festival craft — *"a pookalam laid in daylight."*
+  Organic/ceremonial, editorial discipline.
 - **Decoration level:** Intentional. Governing rule (all three design voices
   agreed): **ornament must represent state.** No stray flower illustrations,
   corner flourishes, or decorative mandalas that don't encode score, progress,
   rank, or status.
-- **Mood:** Warm, handmade, quietly ceremonial during play; lamp-lit and
-  theatrical at the finale. The first-3-seconds target: *"oh — someone made
-  this for us,"* the same breath as finding a real athapookalam in the lobby.
-- **Theme is assigned by surface, not user preference:**
-  - **Act I — Day (phones: solo, join):** cream festival-handbill ground.
-  - **Act II — Dusk (projector: host stage, final standings):** dark courtyard
-    ground; petals and type *emit* light. Projectors crush light backgrounds;
-    the finale earns the drama.
+- **Mood:** Warm, handmade, quietly ceremonial during play, celebratory at
+  the finale. The first-3-seconds target: *"oh — someone made this for us,"*
+  the same breath as finding a real athapookalam in the lobby.
+- **One palette, every surface.** The solo phone flow, the host projector
+  view, and the participant flow all share the warm cream daylight scheme.
+  A dark "Dusk" projector variant was built and **rejected by the owner on
+  2026-08-30** — cross-surface consistency beats theatrical theming here.
+  Do not reintroduce a dark surface without explicit approval.
 - **Reference research (2026-08-30):** kahoot.com, sli.do, jackboxgames.com,
   crowdpurr.com. The category converges on saturated gradients and colored
   answer tiles; none has a material/craft identity. That gap is ours.
@@ -74,7 +74,7 @@ Four voices, strict roles. All Google Fonts, loaded via `<link>` +
   object on screen. Gold is reserved for winning/trophy value — never ordinary
   buttons or routine status.
 
-### Act I — Day (phones)
+### The palette (all surfaces)
 
 | Token | Hex | Use |
 |---|---|---|
@@ -90,27 +90,14 @@ Four voices, strict roles. All Google Fonts, loaded via `<link>` +
 | `--gold` | `#C9A227` | decorative only — never body text |
 | `--gold-text` | `#8A6A10` | gold-toned labels (4.70:1 on cream) |
 
-### Act II — Dusk (projector)
-
-| Token | Hex | Use |
-|---|---|---|
-| `--stage` | `#161008` | background — char-brown, not pure black (projectors crush #000) |
-| `--stage-surface` | `#241A0F` | cards, leaderboard rows |
-| `--stage-raised` | `#332514` | hover/active, host panels |
-| `--kasavu` | `#F6EDDD` | primary text — the day background promoted to ink |
-| `--stage-muted` | `#9A8467` | secondary labels, wrong-answer petals |
-| `--flame` | `#FFA02E` | accent — brighter marigold that *emits* on dark |
-| `--chethi` | `#E4572E` | wrong flash, "last question" urgency |
-| `--leaf` | `#4E9F63` | correct/joined states, lifted for dark ground |
-| `--gold-glow` | `#D9A82F` | borders, ring dividers, podium; may glow: `box-shadow: 0 0 24px rgba(217,168,47,.25)` |
-| `--thumba` | `#FFF7E6` | petal highlights, the sacred center ring |
-
-- **Semantic:** success = green/leaf, warning = gold-text/gold-glow,
-  error = red/chethi, info = muted. Correct/incorrect must always carry a word
-  or symbol as well as color.
-- **Depth:** Day uses hairlines and spacing, not shadows. Dusk uses **light
-  bloom** (glow) for depth, never drop shadows — elements matter in proportion
-  to how much they glow.
+- **Semantic:** success = green, warning = gold-text, error = red,
+  info = muted. Correct/incorrect must always carry a word or symbol as well
+  as color.
+- **Depth:** hairlines and spacing over shadows; the soft warm card shadows
+  already in `styles.css` are the ceiling, not the floor to build on.
+- **Dark mode:** none. A dark "Dusk" projector palette was implemented and
+  rejected on 2026-08-30 (owner call: one consistent scheme everywhere). The
+  rejected token set lives in git history at commit `836523f` if ever needed.
 
 ## Spacing
 
@@ -198,8 +185,8 @@ thumb-reach answers.
    the pookalam a monopoly on color.
 2. **Rank as craft** — costs at-a-glance numeracy mid-round; buys the memorable
    thing.
-3. **Theme by surface (Day/Dusk)** — costs a second token set; buys projector
-   legibility and a finale that feels *lit*, not displayed.
+3. **One palette everywhere** — costs the theatrical dark-finale option; buys
+   a product that reads as one crafted object from phone to projector.
 
 ## Decisions Log
 
@@ -210,5 +197,7 @@ thumb-reach answers.
 | 2026-08-30 | Anek Malayalam as UI face | Malayalam first-class in one variable family; both outside voices agreed |
 | 2026-08-30 | Day/Dusk split by surface | Codex kept daylight, subagent proposed all-dark "Nilavilakku"; synthesis assigns light to phones, dark to projector |
 | 2026-08-30 | Numeric score kept in phone rail, hidden from mid-round projector | Subagent proposed killing all numbers during play; softened — party players ask "what's my score" |
+| 2026-08-30 | **Dusk projector theme removed** | Owner rejected the dark host view after seeing it live: "where is the consistency?" One warm cream palette on every surface. Supersedes the Day/Dusk split above; rejected tokens preserved at commit `836523f` |
+| 2026-08-30 | Home button on every non-start screen | Owner request: players and hosts must be able to return to the main page after entering solo, host, or join |
 
-*Preview artifact: `~/.gstack/projects/Sibhimanyu-onam-utsavam/designs/design-system-20260830/preview.html` (Day/Dusk toggle, specimens, mockups).*
+*Preview artifact: `~/.gstack/projects/Sibhimanyu-onam-utsavam/designs/design-system-20260830/preview.html` (specimens + mockups; its Day/Dusk toggle predates the Dusk rejection — Day is canonical).*
