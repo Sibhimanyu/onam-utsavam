@@ -2,19 +2,20 @@
    The solo quiz at / is untouched by any of this — that is the graded app. */
 
 const Live = (() => {
-  const POLL_MS = 3000;   /* Deliberately not faster. Catalyst allows 10
-                             concurrent executions per function per environment
-                             and returns HTTP 429 past that. A 3s dashboard poll
-                             plus self-paced player writes stays well clear;
-                             a 500ms poll would not. */
-  let pollTimer = null;
+  let stopBoardSubscription = null;
 
   function stopPolling() {
-    if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+    if (stopBoardSubscription) { stopBoardSubscription(); stopBoardSubscription = null; }
   }
 
   function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  function joinUrl() {
+    const configured = String(window.QUIZ_PUBLIC_URL || '').replace(/\/$/, '');
+    const base = configured || location.origin + location.pathname.replace(/\/$/, '');
+    return base + '/#join';
   }
 
   /* ---------------- shared rendering ---------------- */
@@ -68,6 +69,7 @@ const Live = (() => {
           <span class="winner-kicker">Quiz champion</span>
           <h1 class="host-title">${escapeHtml(top.player_name || 'Anonymous')}</h1>
           <div class="score">${top.score} / ${top.total}<small>FINAL SCORE</small></div>
+          ${o.host ? '<img src="img/maveli-happy.webp?v=21" class="champion-maveli" alt="Maveli celebrating the quiz champion">' : ''}
         </div>
         <div class="podium">${podium}</div>
         <div class="lb final-board">${boardHtml(rows, {
@@ -173,6 +175,7 @@ const Live = (() => {
     },
 
     renderLive() {
+      const url = joinUrl();
       document.getElementById('hostBody').innerHTML = `
         <div class="joinbar">
           <div class="qrwrap">
@@ -180,10 +183,7 @@ const Live = (() => {
           </div>
           <div class="joininfo">
             <p class="joinlabel">Scan to join</p>
-            <!-- The ?v= must stay in the typed fallback too. Slate caches
-                 index.html for a year and ignores _headers, so a bare URL can
-                 serve a stale app to any phone that opened it before. -->
-            <p class="joinurl">onam-quiz-tegpgzpi.onslate.in/?v=21#join</p>
+            <p class="joinurl">${escapeHtml(url.replace(/^https?:\/\//, ''))}</p>
             <p class="joinlabel">or enter code</p>
             <p class="joincode">${this.code}</p>
           </div>
@@ -195,21 +195,14 @@ const Live = (() => {
         <button class="btn ghost" id="closeBtn">Close &amp; reveal final scores</button>`;
 
       document.getElementById('closeBtn').addEventListener('click', () => this.close());
-      this.refresh();
       stopPolling();
-      pollTimer = setInterval(() => this.refresh(), POLL_MS);
-    },
-
-    async refresh() {
-      if (!this.code) return;
-      const res = await Api.board(this.code);
-      const slot = document.getElementById('hostBoard');
-      if (!slot) return;
-      if (!res) {
-        slot.innerHTML = `<p class="lb-note">Leaderboard stuck &mdash; retrying…</p>`;
-        return;
-      }
-      slot.innerHTML = boardHtml(res.top);
+      stopBoardSubscription = Api.subscribeBoard(this.code, res => {
+        const slot = document.getElementById('hostBoard');
+        if (!slot) return;
+        slot.innerHTML = res
+          ? boardHtml(res.top)
+          : `<p class="lb-note">Leaderboard unavailable right now.</p>`;
+      });
     },
 
     async close() {
@@ -226,7 +219,7 @@ const Live = (() => {
           <h1 class="host-title">Locking final scores</h1>
           <p class="msg">Closing every quiz screen and preparing the reveal...</p>
         </div>`;
-      await sleep(POLL_MS + 1200);
+      await sleep(900);
       const board = await Api.board(this.code);
       const rows = board && board.top ? board.top : (res && res.top ? res.top : []);
       document.getElementById('hostBody').innerHTML = `
@@ -254,26 +247,21 @@ const Live = (() => {
     answered: 0,
     ended: false,
     finished: false,
-    watchTimer: null,
+    stopStatusSubscription: null,
 
-    /* While a player is answering, poll their own session's status so a host
-       "close" reaches this phone live — otherwise they keep tapping through a
-       round nobody is watching and their finish screen lands on a dead board. */
+    /* A live listener ends this phone's round as soon as its host closes it. */
     startWatch() {
       this.stopWatch();
-      this.watchTimer = setInterval(() => this.checkSession(), POLL_MS);
+      this.stopStatusSubscription = Api.subscribeSessionStatus(this.code, res => {
+        if (res && res.status !== 'open') this.endedByHost();
+      });
     },
 
     stopWatch() {
-      if (this.watchTimer) { clearInterval(this.watchTimer); this.watchTimer = null; }
-    },
-
-    async checkSession() {
-      if (this.ended || !this.code) return;
-      const res = await Api.sessionStatus(this.code);
-      /* A null is a transient network blip — keep playing and retry next tick.
-         Only an explicit non-open status ends the round for this player. */
-      if (res && res.status && res.status !== 'open') this.endedByHost();
+      if (this.stopStatusSubscription) {
+        this.stopStatusSubscription();
+        this.stopStatusSubscription = null;
+      }
     },
 
     async endedByHost() {

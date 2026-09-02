@@ -1,4 +1,4 @@
-# Catalyst function dependencies — reinstalled by the CLI on deploy
+# Dependencies
 node_modules/
 
 # OS noise
@@ -9,15 +9,19 @@ node_modules/
 .claude/
 .gstack/
 
-# Catalyst CLI local state — project/env IDs, machine-specific
+# Firebase CLI project aliases are local to this checkout.
+.firebaserc
+.firebase/
+
+# Retired Catalyst local state can remain in old worktrees without appearing in
+# this Firebase migration.
 .catalystrc
 catalyst-debug.log
+onam-quiz/.catalyst/
+firebase-debug.log
+database-debug.log
 
 # Secrets
 .env
 .env.*
 !.env.example
-
-# `catalyst serve` injects this dev-only live-reload script into the Slate dir.
-# slate-config.toml in the same folder IS tracked, so ignore just this file.
-onam-quiz/.catalyst/reload-script.js

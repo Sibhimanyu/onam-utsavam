@@ -1,0 +1,31 @@
+{
+  "rules": {
+    ".read": "auth != null",
+    "live": {
+      ".write": "auth != null && (!newData.exists() || newData.child('hostUid').val() === auth.uid)",
+      ".validate": "!newData.exists() || (newData.hasChildren(['code', 'hostUid', 'openedAt']) && newData.child('code').isString() && newData.child('code').val().matches(/^[A-Z0-9]{4}$/) && newData.child('hostUid').val() === auth.uid && newData.child('openedAt').isNumber())"
+    },
+    "sessions": {
+      "$code": {
+        ".write": "auth != null && ((!data.exists() && newData.child('hostUid').val() === auth.uid) || (data.exists() && newData.child('hostUid').val() === data.child('hostUid').val() && (data.child('hostUid').val() === auth.uid || (data.child('status').val() === 'open' && newData.child('status').val() === 'closed'))))",
+        ".validate": "$code.matches(/^[A-Z0-9]{4}$/) && newData.hasChildren(['status', 'hostUid', 'createdAt']) && newData.child('status').isString() && (newData.child('status').val() === 'open' || newData.child('status').val() === 'closed') && (!data.exists() ? newData.child('hostUid').val() === auth.uid : newData.child('hostUid').val() === data.child('hostUid').val()) && newData.child('createdAt').isNumber()"
+      }
+    },
+    "players": {
+      "$code": {
+        ".indexOn": ["score", "answered", "createdAt"],
+        "$playerId": {
+          ".write": "auth != null && ((!data.exists() && root.child('sessions').child($code).child('status').val() === 'open' && newData.child('uid').val() === auth.uid) || (data.child('uid').val() === auth.uid && newData.child('uid').val() === auth.uid))",
+          ".validate": "$code.matches(/^[A-Z0-9]{4}$/) && newData.hasChildren(['uid', 'player_name', 'score', 'answered', 'total', 'createdAt', 'updatedAt']) && newData.child('uid').val() === auth.uid && newData.child('player_name').isString() && newData.child('player_name').val().length > 0 && newData.child('player_name').val().length <= 40 && newData.child('score').isNumber() && newData.child('answered').isNumber() && newData.child('total').isNumber() && newData.child('score').val() >= 0 && newData.child('score').val() <= newData.child('total').val() && newData.child('answered').val() >= 0 && newData.child('answered').val() <= newData.child('total').val() && newData.child('total').val() >= 1 && newData.child('total').val() <= 100 && newData.child('createdAt').isNumber() && newData.child('updatedAt').isNumber()"
+        }
+      }
+    },
+    "soloScores": {
+      ".indexOn": ["score"],
+      "$scoreId": {
+        ".write": "auth != null && ((!data.exists() && newData.child('uid').val() === auth.uid) || (data.child('uid').val() === auth.uid && newData.child('uid').val() === auth.uid))",
+        ".validate": "newData.hasChildren(['uid', 'player_name', 'score', 'answered', 'total', 'createdAt', 'updatedAt']) && newData.child('uid').val() === auth.uid && newData.child('player_name').isString() && newData.child('player_name').val().length > 0 && newData.child('player_name').val().length <= 40 && newData.child('score').isNumber() && newData.child('answered').isNumber() && newData.child('total').isNumber() && newData.child('score').val() >= 0 && newData.child('score').val() <= newData.child('total').val() && newData.child('answered').val() === newData.child('total').val() && newData.child('total').val() >= 1 && newData.child('total').val() <= 100 && newData.child('createdAt').isNumber() && newData.child('updatedAt').isNumber()"
+      }
+    }
+  }
+}

@@ -1,5 +1,8 @@
 /* Onam Pookalam Quiz — warm Kerala festival palette on handloom cream.
-   No frameworks, no external fonts. System font stack only. */
+   Design source of truth: DESIGN.md at repo root. One palette everywhere:
+   the solo phone flow, the host projector view, and the participant flow
+   all share this warm daylight scheme. (A dark projector variant was tried
+   on 2026-08-30 and rejected — consistency across surfaces won.) */
 
 :root {
   --cream:     #FBF6EC;
@@ -17,8 +20,13 @@
   --muted:     #6F685D;   /* 5.11:1 on cream */
   --rank:      #8A8275;
 
-  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
-  --sans:  -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  /* Buttons carry ink on marigold in both acts; a variable would flip it. */
+  --btn-ink:   #2A2118;
+
+  --serif: "Fraunces", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  --sans:  "Anek Malayalam", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --data:  "IBM Plex Sans Condensed", "Avenir Next Condensed", "Arial Narrow", sans-serif;
+  --flourish: "Chilanka", cursive;
 }
 
 * { box-sizing: border-box; }
@@ -102,8 +110,10 @@ body::after {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
+  font-family: var(--data);
+  font-weight: 500;
   font-variant-numeric: tabular-nums;
-  font-size: 12.5px;
+  font-size: 13px;
   color: var(--muted);
   letter-spacing: .02em;
   margin-bottom: 6px;
@@ -183,6 +193,12 @@ body::after {
 .subtitle-ml {
   letter-spacing: normal;
   text-transform: none;
+  /* The one Chilanka flourish this screen gets (DESIGN.md: exactly one use
+     per screen, or none). Handwriting = human hand = pookalam-making. */
+  font-family: var(--flourish);
+  font-size: 17px;
+  font-weight: 400;
+  color: var(--red);
 }
 
 .maveli-wrap {
@@ -202,6 +218,9 @@ body::after {
 .title {
   font-family: var(--serif);
   font-size: clamp(28px, 4vw, 40px);
+  font-weight: 800;
+  /* Fraunces wonk axis ON for celebration screens, OFF for questions. */
+  font-variation-settings: "opsz" 144, "SOFT" 40, "WONK" 1;
   line-height: 1.1;
   text-wrap: balance;
   text-align: center;
@@ -250,6 +269,8 @@ body::after {
 
 .q {
   font-family: var(--serif);
+  font-weight: 600;
+  font-variation-settings: "opsz" 40, "WONK" 0;
   font-size: 19px;
   line-height: 1.35;
   margin: 0 0 14px;
@@ -281,7 +302,7 @@ body::after {
   color: var(--ink);
   background: var(--paper);
   border: 1px solid var(--hair);
-  border-radius: 10px;
+  border-radius: 4px;
   cursor: pointer;
   /* Guaranteed, not inferred. Options happened to render at 47px from padding
      alone, but Start Quiz landed at 42px and .btn.small smaller still. A floor
@@ -302,23 +323,30 @@ body::after {
    disabled but must stay readable — especially the correct one. */
 .opt:disabled { cursor: default; color: var(--ink); opacity: 1; }
 
+/* Ballot marker: a Malayalam numeral (൧ ൨ ൩ ൪) with a small Latin subscript.
+   DESIGN.md: only the pookalam is circular — the marker is bare typography,
+   not a badge. The data face keeps the column steady across rows. */
 .opt .k {
   flex: 0 0 auto;
-  width: 21px;
-  height: 21px;
-  border-radius: 50%;
-  border: 1px solid var(--hair);
-  display: grid;
-  place-items: center;
-  font-size: 11px;
-  font-weight: 600;
+  min-width: 26px;
+  font-family: var(--data);
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--gold-text);
+}
+
+.opt .k sub {
+  font-size: 10px;
+  font-weight: 500;
   color: var(--muted);
+  margin-left: 1px;
 }
 
 .opt.good { border-color: var(--green); background: #F1F7F2; }
-.opt.good .k { background: var(--green); border-color: var(--green); color: #fff; }
+.opt.good .k { color: var(--green); }
 .opt.bad  { border-color: var(--red); background: #FCF1F0; }
-.opt.bad .k { background: var(--red); border-color: var(--red); color: #fff; }
+.opt.bad .k { color: var(--red); }
 .opt.dim  { opacity: .5; }
 .opts.answered .opt.dim { display: none; }
 
@@ -469,11 +497,14 @@ body::after {
 :where(.opt, .btn, .lb-form input, button):focus-visible {
   outline: 2px solid var(--red);
   outline-offset: 2px;
-  border-radius: 10px;
+  border-radius: 4px;
 }
 
 /* ---------- buttons ---------- */
 
+/* Primary action per DESIGN.md: solid marigold with ink text — marigold is
+   the active color; gradients don't label actions here. Red stays ceremonial
+   (titles, wrong-state, the ghost close-round button). */
 .btn {
   display: block;
   width: 100%;
@@ -483,20 +514,20 @@ body::after {
   font-size: 14.5px;
   font-weight: 700;
   letter-spacing: .04em;
-  color: #fff;
-  background: linear-gradient(160deg, #C5301A 0%, #A8201A 100%);
+  color: var(--btn-ink);
+  background: var(--marigold);
   border: 0;
-  border-radius: 10px;
+  border-radius: 4px;
   cursor: pointer;
   min-height: 44px;
-  box-shadow: 0 4px 16px rgba(168, 32, 26, .28), inset 0 1px 0 rgba(255,255,255,.12);
+  box-shadow: 0 4px 16px rgba(240, 140, 0, .26);
   transition: background .16s ease, transform .16s ease, box-shadow .16s ease;
 }
 
 .btn:hover {
-  background: linear-gradient(160deg, #A82818 0%, #8E1A15 100%);
+  background: #D97B00;
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(168, 32, 26, .34), inset 0 1px 0 rgba(255,255,255,.12);
+  box-shadow: 0 6px 20px rgba(240, 140, 0, .32);
 }
 .btn.small { width: auto; margin: 0; padding: 10px 16px; font-size: 14px; min-height: 44px; }
 
@@ -644,8 +675,8 @@ body::after {
 
 .score small {
   display: block;
-  font-family: var(--sans);
-  font-size: 10.5px;
+  font-family: var(--data);
+  font-size: 11px;
   font-weight: 600;
   letter-spacing: .13em;
   color: var(--muted);
@@ -769,6 +800,19 @@ body::after {
   margin-bottom: 4px;
 }
 
+.champion-maveli {
+  position: absolute;
+  z-index: 0;
+  right: 4px;
+  bottom: 0;
+  width: clamp(76px, 9vw, 126px);
+  height: auto;
+  pointer-events: none;
+  filter: drop-shadow(0 8px 12px rgba(42, 33, 24, 0.16));
+}
+
+.winner-burst > :not(.champion-maveli) { position: relative; z-index: 1; }
+
 .podium {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -890,11 +934,12 @@ body::after {
 
 /* The code is read off a projector from the back of a room. Big, spaced, mono. */
 .joincode {
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  /* DESIGN.md: the room code is display typography, not a badge. */
+  font-family: var(--data);
   font-variant-numeric: tabular-nums;
   font-size: 38px;
   font-weight: 700;
-  letter-spacing: .14em;
+  letter-spacing: .18em;
   line-height: 1;
   color: var(--red);
   margin: 0;
@@ -920,7 +965,8 @@ body::after {
   display: flex;
   align-items: baseline;
   gap: 8px;
-  font-weight: 650;
+  font-family: var(--data);
+  font-weight: 600;
   /* The board repaints every 3s while scores climb. With proportional digits a
      6 becoming a 7 shifts the column; tabular figures hold the position. */
   font-variant-numeric: tabular-nums;
@@ -971,6 +1017,9 @@ body::after {
     padding: 8px 10px;
   }
   .feedback-copy .btn { margin-top: 8px; }
+  /* Keep the four answer slots stable after a tap. Hiding the unselected
+     choices makes the correct answer appear to jump into an earlier position. */
+  .opts.answered .opt.dim { display: flex; }
   .mode-row { flex-direction: column; }
   .mode-btn { width: 100%; }
   .podium { grid-template-columns: 1fr; }
@@ -1024,7 +1073,6 @@ body::after {
    breakpoints. Fallback is graceful: a browser without :has() simply keeps the
    phone-sized layout instead of breaking. */
 @media (min-width: 900px) {
-  /* Fill the screen and centre vertically — no dead band under the content. */
   body:has(.host) { place-items: center; padding: 24px; }
 
   .stage:has(.host) { max-width: min(1500px, 94vw); width: 100%; }
@@ -1041,11 +1089,10 @@ body::after {
 
   .stage:has(.host) .joinlabel { font-size: clamp(12px, 1.15vw, 22px); margin-bottom: 6px; }
   .stage:has(.host) .joinurl   { font-size: clamp(14px, 1.25vw, 26px); margin-bottom: 18px; }
-  /* The single most important thing on the screen. */
   .stage:has(.host) .joincode  { font-size: clamp(64px, 8.5vw, 168px); }
 
   .stage:has(.host) .lb h4     { font-size: clamp(12px, 1.15vw, 22px); }
-  .stage:has(.host) .row       { font-size: clamp(18px, 1.8vw, 36px); padding: clamp(8px, 0.7vw, 16px) 0; }
+  .stage:has(.host) .row       { font-size: clamp(18px, 1.8vw, 36px); padding: clamp(8px, .7vw, 16px) 0; }
   .stage:has(.host) .rk        { width: clamp(20px, 2vw, 40px); }
   .stage:has(.host) .prog-dots { font-size: clamp(12px, 1vw, 20px); }
   .stage:has(.host) .lb-note   { font-size: clamp(15px, 1.4vw, 28px); }
@@ -1054,48 +1101,143 @@ body::after {
   /* Bigger, so "this board is live" reads from the back of the room. */
   .stage:has(.host) .pulse { width: clamp(9px, 0.9vw, 18px); height: clamp(9px, 0.9vw, 18px); }
 
+  /* Final standings are read as a board, not a victory poster. Keep the
+     champion prominent at left and reserve the projector height for scores. */
+  .stage:has(.host) .host-reveal {
+    display: grid;
+    grid-template-columns: minmax(260px, .72fr) minmax(0, 1.28fr);
+    grid-template-areas:
+      "meta board"
+      "winner board"
+      "podium board";
+    align-items: start;
+    column-gap: clamp(20px, 2.6vw, 44px);
+    row-gap: 8px;
+    text-align: left;
+  }
+
+  .stage:has(.host) .host-reveal > .joinlabel {
+    grid-area: meta;
+    margin: 0;
+  }
+
   .stage:has(.host) .host-reveal .winner-burst {
-    padding: clamp(22px, 2.5vw, 48px);
-    margin-top: clamp(10px, 1vw, 20px);
+    grid-area: winner;
+    padding: clamp(14px, 1.35vw, 24px);
+    margin: 0;
   }
 
   .stage:has(.host) .host-reveal .winner-kicker {
-    font-size: clamp(14px, 1.3vw, 26px);
+    font-size: clamp(11px, .9vw, 16px);
   }
 
   .stage:has(.host) .host-reveal .host-title {
-    font-size: clamp(46px, 6vw, 112px);
-    margin: 8px 0;
+    font-size: clamp(38px, 4vw, 68px);
+    margin: 4px 0;
   }
 
   .stage:has(.host) .host-reveal .score {
-    font-size: clamp(54px, 7vw, 128px);
+    font-size: clamp(42px, 4.5vw, 72px);
+    margin-top: 6px;
+    padding-right: clamp(72px, 8vw, 118px);
   }
 
-  .stage:has(.host) .podium {
-    gap: clamp(12px, 1.5vw, 28px);
-    margin-top: clamp(16px, 1.8vw, 34px);
+  .stage:has(.host) .host-reveal .champion-maveli {
+    width: clamp(82px, 9vw, 132px);
   }
 
-  .stage:has(.host) .podium-card {
-    padding: clamp(14px, 1.4vw, 28px);
+  .stage:has(.host) .host-reveal .podium {
+    grid-area: podium;
+    grid-template-columns: 1fr;
+    gap: 6px;
+    margin: 0;
   }
 
-  .stage:has(.host) .podium-rank {
-    width: clamp(36px, 3.2vw, 68px);
-    height: clamp(36px, 3.2vw, 68px);
-    font-size: clamp(18px, 1.8vw, 34px);
+  .stage:has(.host) .host-reveal .podium-card {
+    display: grid;
+    grid-template-columns: 32px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    text-align: left;
   }
 
-  .stage:has(.host) .podium-card strong {
-    font-size: clamp(18px, 1.7vw, 34px);
+  .stage:has(.host) .host-reveal .podium-rank {
+    width: 28px;
+    height: 28px;
+    margin: 0;
+    font-size: 14px;
   }
 
-  .stage:has(.host) .podium-card span:last-child {
-    font-size: clamp(18px, 1.7vw, 34px);
+  .stage:has(.host) .host-reveal .podium-card strong {
+    font-size: clamp(14px, 1.2vw, 18px);
   }
 
-  .stage:has(.host) .final-board {
-    max-height: 28vh;
+  .stage:has(.host) .host-reveal .podium-card span:last-child {
+    margin: 0;
+    font-size: clamp(14px, 1.1vw, 18px);
   }
+
+  .stage:has(.host) .host-reveal .final-board {
+    grid-area: board;
+    align-self: stretch;
+    max-height: min(56vh, 420px);
+    margin: 0;
+    padding-top: 0;
+  }
+
+  .stage:has(.host) .host-reveal .final-board .row {
+    font-size: clamp(16px, 1.3vw, 22px);
+    padding: clamp(5px, .42vw, 8px) 0;
+  }
+
+  .stage:has(.host) .host-reveal .final-board .rk { width: clamp(18px, 1.5vw, 26px); }
+  .stage:has(.host) .host-reveal .final-board .prog-dots { font-size: clamp(10px, .75vw, 13px); }
+
+  .stage:has(.host) #hostBody:has(.host-reveal) > .btn {
+    margin-top: 10px;
+  }
+}
+
+/* ---------- back to start ----------
+
+   One quiet way home from every screen that is not the start screen: solo
+   questions, the host dashboard, and the participant flow. Sits in normal
+   flow between the kasavu band and the content so it never overlaps the
+   progress row or the host title. Same palette as everything else —
+   DESIGN.md: one warm cream act across all surfaces. */
+
+/* The author display below beats the UA's [hidden] { display: none }, so the
+   hidden attribute must be re-armed explicitly or the button shows on the
+   start screen while hidden=true. */
+.back-link[hidden] { display: none; }
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  margin: 12px 22px 0;
+  padding: 8px 14px;
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  color: var(--muted);
+  background: transparent;
+  border: 1px solid var(--hair);
+  border-radius: 4px;
+  cursor: pointer;
+  min-height: 40px;
+  transition: color .16s ease, border-color .16s ease, background .16s ease;
+}
+
+.back-link:hover {
+  color: var(--red);
+  border-color: var(--red);
+  background: var(--paper);
+}
+
+/* Projector: the host stands at the laptop, but the control should still be
+   findable without leaning in. */
+@media (min-width: 900px) {
+  .stage:has(.host) .back-link { font-size: clamp(13px, 1vw, 18px); }
 }
